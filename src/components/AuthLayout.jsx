@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom";
 import { GraduationCap, Network, FileText, Map } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
-// Shared left-hand brand panel + right-hand form shell used by both
-// SignIn and SignUp so the two pages stay visually identical.
 export default function AuthLayout({ heading, subheading, children }) {
   return (
-    <div className="flex min-h-screen bg-white">
-      {/* Left brand panel — hidden on small screens */}
+    <div className="flex min-h-screen bg-white dark:bg-slate-950">
+      {/* Left brand panel */}
       <div className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-teal-500 p-10 text-white sm:flex">
-        {/* dot-grid texture, same motif as the landing page */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.12]"
           style={{
@@ -37,7 +35,6 @@ export default function AuthLayout({ heading, subheading, children }) {
             maps in a few clicks.
           </p>
 
-          {/* floating icon badges — echoes the upload-ring motif elsewhere */}
           <div className="mt-8 flex gap-3">
             {[Network, Map, FileText].map((Icon, i) => (
               <span
@@ -56,18 +53,21 @@ export default function AuthLayout({ heading, subheading, children }) {
       </div>
 
       {/* Right form panel */}
-      <div className="flex w-full flex-1 items-center justify-center bg-ivory px-6 py-12 sm:w-[56%]">
+      <div className="flex w-full flex-1 items-center justify-center bg-ivory px-6 py-12 sm:w-[56%] dark:bg-slate-900">
         <div className="w-full max-w-sm">
-          <Link
-            to="/"
-            className="mb-8 inline-flex items-center gap-2 sm:hidden font-display font-bold text-[15px] bg-gradient-to-r from-indigo-600 via-violet-600 to-teal-600 bg-clip-text text-transparent"
-          >
-            AcadPlan AI
-          </Link>
+          <div className="flex items-center justify-between mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 sm:hidden font-display font-bold text-[15px] bg-gradient-to-r from-indigo-600 via-violet-600 to-teal-600 bg-clip-text text-transparent"
+            >
+              AcadPlan AI
+            </Link>
+            <ThemeToggle />
+          </div>
 
-          <h1 className="font-display font-bold text-2xl text-ink">{heading}</h1>
+          <h1 className="font-display font-bold text-2xl text-ink dark:text-white">{heading}</h1>
           {subheading && (
-            <p className="mt-1.5 text-[13.5px] text-slate-500">{subheading}</p>
+            <p className="mt-1.5 text-[13.5px] text-slate-500 dark:text-slate-400">{subheading}</p>
           )}
 
           <div className="mt-8">{children}</div>
