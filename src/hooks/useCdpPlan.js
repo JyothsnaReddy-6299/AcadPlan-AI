@@ -4,6 +4,15 @@ import {
   generateCdpDocument,
   saveCdpDraft,
 } from "../services/cdpService";
+import { buildConceptMap } from "../utils/conceptMap";
+
+// Ensures every plan carries a concept map: when the extracted CDP does not
+// include one, it is generated automatically from the plan data.
+function withConceptMap(plan) {
+  if (!plan) return plan;
+  if (plan.mermaidChart && plan.mermaidChart.trim()) return plan;
+  return { ...plan, mermaidChart: buildConceptMap(plan) };
+}
 
 export function useCdpPlan(courseId = "23CSE201") {
   const [plan, setPlan] = useState(null);
@@ -16,7 +25,7 @@ export function useCdpPlan(courseId = "23CSE201") {
     fetchCdpPlan(courseId)
       .then((data) => {
         if (!active) return;
-        setPlan(data);
+        setPlan(withConceptMap(data));
         setStatus("idle");
       })
       .catch(() => active && setStatus("error"));
@@ -29,6 +38,14 @@ export function useCdpPlan(courseId = "23CSE201") {
   const updatePlan = useCallback((updater) => {
     setPlan((current) =>
       typeof updater === "function" ? updater(current) : updater
+    );
+  }, []);
+
+  // Rebuilds the concept map from the current plan data, overwriting any
+  // existing chart.
+  const regenerateConceptMap = useCallback(() => {
+    setPlan((current) =>
+      current ? { ...current, mermaidChart: buildConceptMap(current) } : current
     );
   }, []);
 
@@ -56,5 +73,12 @@ export function useCdpPlan(courseId = "23CSE201") {
     }
   }, [courseId, plan]);
 
-  return { plan, updatePlan, saveDraft, generateDocument, status };
+  return {
+    plan,
+    updatePlan,
+    saveDraft,
+    generateDocument,
+    regenerateConceptMap,
+    status,
+  };
 }

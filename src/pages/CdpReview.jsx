@@ -6,6 +6,7 @@ import {
   FileText,
   Loader2,
   Plus,
+  RefreshCw,
   Save,
   Trash2,
 } from "lucide-react";
@@ -343,8 +344,14 @@ function buildPrintableCdp(plan) {
 }
 
 export default function CdpReview() {
-  const { plan, updatePlan, saveDraft, generateDocument, status } =
-    useCdpPlan(COURSE_ID);
+  const {
+    plan,
+    updatePlan,
+    saveDraft,
+    generateDocument,
+    regenerateConceptMap,
+    status,
+  } = useCdpPlan(COURSE_ID);
   const [activeTab, setActiveTab] = useState("edit");
 
   const mappingKeys = useMemo(() => getMappingKeys(plan), [plan]);
@@ -881,6 +888,20 @@ export default function CdpReview() {
             </Section>
 
             <Section title="Concept Map" icon={FileText}>
+              <div className="mb-4 flex flex-col gap-2 rounded-lg border border-indigo-100 bg-indigo-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-indigo-900">
+                  Auto-generated from the units, topics and CO mappings above.
+                  Regenerate it after editing the plan.
+                </p>
+                <button
+                  type="button"
+                  onClick={regenerateConceptMap}
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                >
+                  <RefreshCw size={16} />
+                  Regenerate from Plan
+                </button>
+              </div>
               <MermaidConceptMap chart={plan.mermaidChart} />
               <details className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
                 <summary className="cursor-pointer text-sm font-semibold text-slate-700">
