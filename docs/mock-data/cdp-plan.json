@@ -1,0 +1,395 @@
+{
+  "status": "success",
+  "courseMetadata": {
+    "code": "23CSE201",
+    "name": "Procedural Programming Using C",
+    "academicYear": null,
+    "courseMentor": null,
+    "preRequisites": "NIL",
+    "credits": {
+      "L": 3,
+      "T": 0,
+      "P": 2,
+      "C": 4
+    }
+  },
+    "courseOutcomes": [
+    { "id": "CO1", "description": "Understand the typical programming constructs: data (primitive and compound), control, modularity, recursion, etc. thereby to understand a given program." },
+    { "id": "CO2", "description": "Analyze the given program by tracing, identify coding errors and debug them." },
+    { "id": "CO3", "description": "Apply the programming constructs appropriately and effectively while developing computer program." },
+    { "id": "CO4", "description": "Develop computer programs that implement suitable algorithms for problem scenarios and applications." }
+  ],
+  "coPoMappings": [
+    { "co": "CO1", "po1": 2, "po2": 1, "po3": "-", "po4": "-", "po5": "-", "po6": "-", "po7": "-", "po8": "-", "po9": "-", "po10": "-", "po11": "-", "po12": "-", "pso1": 2, "pso2": 2 },
+    { "co": "CO2", "po1": 2, "po2": 1, "po3": 1, "po4": "-", "po5": 2, "po6": "-", "po7": "-", "po8": "-", "po9": "-", "po10": "-", "po11": "-", "po12": "-", "pso1": 2, "pso2": 2 },
+    { "co": "CO3", "po1": 2, "po2": 2, "po3": 2, "po4": "-", "po5": 2, "po6": "-", "po7": "-", "po8": "-", "po9": "-", "po10": "-", "po11": "-", "po12": "-", "pso1": 2, "pso2": 2 },
+    { "co": "CO4", "po1": 3, "po2": 2, "po3": 3, "po4": "-", "po5": 3, "po6": "-", "po7": "-", "po8": "-", "po9": "-", "po10": "-", "po11": "-", "po12": "-", "pso1": 2, "pso2": 2 }
+  ],
+  "lecturePlan": [
+    {
+      "unit": 1,
+      "classPeriod": "1-2(L)",
+      "topic": "Review of Physical Computing",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://www.youtube.com/watch?v=fJWR7dBuc",
+      "coMapping": ["CO1"],
+      "reference": ["T1"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "3-5(L)",
+      "topic": "Understanding Arduino Hardware and Software Architecture",
+      "modeOfTeaching": "Presentation & Smart board",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://www.youtube.com/watch?v=nL34zDTPkcs",
+      "coMapping": ["CO1"],
+      "reference": ["T1"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "6-8(L)",
+      "topic": "Verifying Hardware and Software - Loading and Running your First Program",
+      "modeOfTeaching": "Smart board & Demonstration of programs",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://www.youtube.com/watch?v=ZO1IXMxLRqc",
+      "coMapping": ["CO1"],
+      "reference": ["T1"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "9-10(L)",
+      "topic": "Introduction to C - Structure of C programs - Data types",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "11-14(L)",
+      "topic": "Constants, Variables, Identifiers, Keywords, Declarations, Expressions, Statements, and Symbolic constants",
+      "modeOfTeaching": "Presentation & Smart board",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "15-17(L)",
+      "topic": "Input and Output: getchar, putchar, scanf, printf, gets, puts, functions",
+      "modeOfTeaching": "Smart board & Demonstration of programs",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "18-19(P)",
+      "topic": "Pre-processor commands, Preparing and running a complete C program.",
+      "modeOfTeaching": "Presentation & Smart board",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "20-21(L)",
+      "topic": "Supplementary Programs of class 11 to 17",
+      "modeOfTeaching": "Discussion",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "22-23(L)",
+      "topic": "Operators and expressions: Arithmetic, unary, logical, bit-wise, assignment and conditional operators",
+      "modeOfTeaching": "Presentation & Smart board",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "24-25(L)",
+      "topic": "Control statements: if-else, switch, break, continue",
+      "modeOfTeaching": "Smart board & Demonstration of programs",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "26-27 (P)",
+      "topic": "Supplementary Programs of class 24 to 25",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "28-29(P)",
+      "topic": "Activity Sheet: 01",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "30-33(L)",
+      "topic": "while, do-while, for statements, nested loops, goto statements, comma operator.",
+      "modeOfTeaching": "Smartboard & Demonstration of programs",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO1"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "34-35(P)",
+      "topic": "Supplementary Programs: loop statements",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2", "CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "36-37 (P)",
+      "topic": "Activity Sheet: 02",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2", "CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "38-39 (P)",
+      "topic": "Solve problems from R4",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO2", "CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 1,
+      "classPeriod": "40-41(P)",
+      "topic": "Mid term - Lab Assessment",
+      "modeOfTeaching": "Evaluation",
+      "inClassActivity": "Not Applicable",
+      "outClassActivity": "NA",
+      "coMapping": ["CO1"],
+      "reference": ["R1", "R2"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "42-43(L)",
+      "topic": "Arrays: Defining and processing an array, Passing array to a function, multi-dimensional arrays, Sequential search, Sorting arrays",
+      "modeOfTeaching": "Smartboard",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "44-45 (P)",
+      "topic": "Activity Sheet: 03",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "46-49 (L)",
+      "topic": "Functions: Defining and accessing function, passing arguments, function prototypes",
+      "modeOfTeaching": "Smartboard & Demostration using C Compiler",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "50-53(L)",
+      "topic": "Storage classes",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO2"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "54-55(P)",
+      "topic": "Solve problems from R3,R4",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "56-59(L)",
+      "topic": "Recursion",
+      "modeOfTeaching": "Smartboard & Demostration using C Compiler",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO1"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "60-61(P)",
+      "topic": "Activity Sheet: 04",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "62-64(L)",
+      "topic": "Pointers: Introduction, Declarations, Passing pointer to a function, Operations on pointers, Arrays and Pointers",
+      "modeOfTeaching": "Smartboard & Demonstration using C Compiler",
+      "inClassActivity": "Problem based learning using direct instruction method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "65-66(L)",
+      "topic": "Pointer to functions, Dynamic memory allocation.",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 2,
+      "classPeriod": "67-68(P)",
+      "topic": "Activity Sheet: 05",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "69(L)",
+      "topic": "Structures unions & data storage: Defining and processing a structure, passing structure to a function, Pointers; and Unions",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "70(L)",
+      "topic": "Strings: fixed length and variable length strings, strings and characters",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Cooperative Learning",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "71-72(L)",
+      "topic": "String handling, Operations on strings String Manipulation functions",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "73-74(P)",
+      "topic": "Activity Sheet :06",
+      "modeOfTeaching": "Lab Practice",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "NA",
+      "coMapping": ["CO3"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "75-76(P)",
+      "topic": "Files and Streams Open, Close, Create, File operations, Unformatted data files, Experiments on String Handling (Ex.no.8)",
+      "modeOfTeaching": "Lab Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO3", "CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "77-79(L)",
+      "topic": "C Pre-processor - Command line arguments",
+      "modeOfTeaching": "Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "https://nptel.ac.in/courses/106104128",
+      "coMapping": ["CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "80-82(P)",
+      "topic": "Activity Sheet: 07",
+      "modeOfTeaching": "Lab Presentation",
+      "inClassActivity": "Direct Instruction Method",
+      "outClassActivity": "NA",
+      "coMapping": ["CO4"],
+      "reference": ["R1", "R2", "R3", "R4"]
+    },
+    {
+      "unit": 3,
+      "classPeriod": "83-90(P)",
+      "topic": "Developing applications using Arduino Part I & Part II",
+      "modeOfTeaching": "Open-ended discussions",
+      "inClassActivity": "Hands-on Learning",
+      "outClassActivity": "https://www.youtube.com/watch?v=BLrHTHUjPuw&t383s",
+      "coMapping": ["CO4"],
+      "reference": ["T1"]
+    }
+  ],
+  "evaluationAndGrading": {
+    "totalMarks": 100,
+    "components": [
+      { "name": "Mid Term Examination", "marks": 20, "type": "Internal" },
+      { "name": "Continuous Assessment – Theory (CAT)", "marks": 10, "type": "Internal" },
+      { "name": "Continuous Assessment – Lab (CAL)", "marks": 40, "type": "Internal" },
+      { "name": "End Semester", "marks": 30, "type": "External" }
+    ],
+    "threshold": [
+      { "level": 1, "targetPercentage": 50, "studentPercentage": 70 },
+      { "level": 2, "targetPercentage": 60, "studentPercentage": 60 },
+      { "level": 3, "targetPercentage": 65, "studentPercentage": 60 }
+    ]
+  }
+
+}
