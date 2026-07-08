@@ -1,6 +1,6 @@
 import { apiRequest } from "../lib/Api";
 
-const MOCK_CDP_URL = "/mock-data/cdp-plan.json";
+const MOCK_CDP_URL = "mock-data/cdp-plan.json";
 const STORAGE_KEY = "acadplan_cdp_draft_v5";
 const shouldUseMockApi = import.meta.env.VITE_USE_MOCK_API !== "false";
 

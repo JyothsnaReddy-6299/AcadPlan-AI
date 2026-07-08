@@ -20,12 +20,12 @@ export function createDefaultMatrix() {
 export function getCellStyles(value) {
   switch (value) {
     case "1":
-      return "text-emerald-700 border-emerald-200 bg-emerald-100/80";
+      return "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 bg-emerald-100/80 dark:bg-emerald-900/40";
     case "2":
-      return "text-sky-700 border-sky-300 bg-sky-100/80";
+      return "text-sky-700 dark:text-sky-400 border-sky-300 dark:border-sky-800 bg-sky-100/80 dark:bg-sky-900/40";
     case "3":
       return "text-white border-indigo-600 bg-indigo-600";
     default:
-      return "text-slate-400 border-slate-200 border-dashed bg-white/40";
+      return "text-slate-400 dark:text-gray-500 border-slate-200 dark:border-gray-700 border-dashed bg-white/40 dark:bg-gray-800/40";
   }
 }

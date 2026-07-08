@@ -45,14 +45,14 @@ const EMPTY_LECTURE = {
 function TextInput({ label, value, onChange, type = "text" }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
         {label}
       </span>
       <input
         type={type}
         value={value ?? ""}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+        className="w-full rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-800"
       />
     </label>
   );
@@ -61,14 +61,14 @@ function TextInput({ label, value, onChange, type = "text" }) {
 function TextArea({ label, value, onChange, rows = 3 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+      <span className="mb-1.5 block text-[12px] font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
         {label}
       </span>
       <textarea
         rows={rows}
         value={value ?? ""}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm leading-6 text-slate-800 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+        className="w-full resize-y rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm leading-6 text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-800"
       />
     </label>
   );
@@ -76,12 +76,12 @@ function TextArea({ label, value, onChange, rows = 3 }) {
 
 function Section({ title, icon: Icon, children }) {
   return (
-    <section className="border-t border-slate-200 py-7 first:border-t-0 first:pt-0">
+    <section className="border-t border-slate-200 dark:border-gray-700 py-7 first:border-t-0 first:pt-0">
       <div className="mb-4 flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-50 text-indigo-600">
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
           <Icon size={16} />
         </span>
-        <h2 className="text-base font-bold text-slate-900">{title}</h2>
+        <h2 className="text-base font-bold text-slate-900 dark:text-gray-100">{title}</h2>
       </div>
       {children}
     </section>
@@ -266,10 +266,23 @@ export default function CdpReview() {
 
   if (status === "loading" || !plan) {
     return (
-      <main className="grid min-h-screen place-items-center bg-slate-50">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
-          <Loader2 className="animate-spin" size={18} />
-          Loading extracted CDP JSON
+      <main className="grid min-h-screen place-items-center bg-slate-50 dark:bg-gray-950">
+        <div className="flex flex-col items-center gap-4">
+          {status === "error" ? (
+            <div className="flex items-center gap-2 rounded-xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-900/20 px-5 py-3 text-sm font-semibold text-red-600 dark:text-red-400">
+              Failed to load CDP data — check the console
+            </div>
+          ) : (
+            <>
+              <div className="grid h-14 w-14 place-items-center rounded-2xl grad-brand shadow-glow animate-pulse-glow">
+                <Loader2 className="animate-spin h-6 w-6 text-white" />
+              </div>
+              <p className="text-sm font-semibold text-slate-500 dark:text-gray-400">Loading CDP data…</p>
+              <div className="w-48 h-1 rounded-full bg-slate-200 dark:bg-gray-800 overflow-hidden">
+                <div className="h-full w-full grad-brand animate-shimmer" />
+              </div>
+            </>
+          )}
         </div>
       </main>
     );
@@ -291,50 +304,59 @@ export default function CdpReview() {
     updatePlan((current) => ({ ...current, [key]: nextValue }));
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
-              CDP Review
-            </p>
-            <h1 className="mt-1 text-2xl font-bold">
-              {metadata.code} - {metadata.name}
-            </h1>
+    <main className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
+      {/* ── Premium page header ── */}
+      <div className="sticky top-0 z-30 border-b border-slate-200/80 dark:border-gray-800/80 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl grad-brand shadow-glow-sm shrink-0">
+              <BookOpen size={16} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                CDP Review
+              </p>
+              <h1 className="text-lg font-bold text-ink dark:text-gray-100 leading-tight">
+                {metadata.code}
+                <span className="font-normal text-slate-400 dark:text-gray-500 mx-1.5">—</span>
+                {metadata.name}
+              </h1>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setActiveTab(activeTab === "edit" ? "preview" : "edit")}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="btn-lift inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-[13px] font-semibold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 shadow-card focus-ring transition-all"
             >
-              <FileText size={16} />
+              <FileText size={15} />
               {activeTab === "edit" ? "Preview" : "Edit"}
             </button>
             <button
               type="button"
               onClick={saveDraft}
               disabled={status === "saving"}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+              className={`btn-lift inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-semibold shadow-card focus-ring transition-all disabled:opacity-60 ${
+                status === "saved"
+                  ? "border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
+                  : "border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700"
+              }`}
             >
               {status === "saving" ? (
-                <Loader2 className="animate-spin" size={16} />
+                <Loader2 className="animate-spin" size={15} />
               ) : status === "saved" ? (
-                <Check size={16} />
+                <Check size={15} className="text-emerald-600" />
               ) : (
-                <Save size={16} />
+                <Save size={15} />
               )}
               {status === "saved" ? "Saved" : "Save Draft"}
             </button>
             <button
               type="button"
-              onClick={() => {
-                generateDocument();
-                printCdp(plan);
-              }}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+              onClick={() => { generateDocument(); printCdp(plan); }}
+              className="btn-lift inline-flex items-center gap-2 rounded-lg grad-brand px-3.5 py-2 text-[13px] font-semibold text-white shadow-glow-sm hover:shadow-glow focus-ring transition-all"
             >
-              <Download size={16} />
+              <Download size={15} />
               Generate File
             </button>
           </div>
@@ -342,32 +364,44 @@ export default function CdpReview() {
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[280px_1fr]">
-        <aside className="h-max rounded-lg border border-slate-200 bg-white p-4">
-          <div className="grid grid-cols-2 gap-3 text-center">
-            <div className="rounded-lg bg-slate-50 p-3">
-              <div className="text-xl font-bold">{plan.courseOutcomes?.length ?? 0}</div>
-              <div className="text-xs text-slate-500">COs</div>
+        {/* ── Sidebar ── */}
+        <aside className="h-max rounded-2xl border border-slate-200/80 dark:border-gray-800/80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-card p-5 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-slate-50 dark:bg-gray-800/80 border border-slate-100 dark:border-gray-700/50 p-3 text-center">
+              <div className="font-display text-2xl font-extrabold grad-brand-text">{plan.courseOutcomes?.length ?? 0}</div>
+              <div className="text-[11.5px] font-semibold text-slate-500 dark:text-gray-400 mt-0.5">Course Outcomes</div>
             </div>
-            <div className="rounded-lg bg-slate-50 p-3">
-              <div className="text-xl font-bold">{plan.lecturePlan?.length ?? 0}</div>
-              <div className="text-xs text-slate-500">Sessions</div>
+            <div className="rounded-xl bg-slate-50 dark:bg-gray-800/80 border border-slate-100 dark:border-gray-700/50 p-3 text-center">
+              <div className="font-display text-2xl font-extrabold grad-brand-text">{plan.lecturePlan?.length ?? 0}</div>
+              <div className="text-[11.5px] font-semibold text-slate-500 dark:text-gray-400 mt-0.5">Sessions</div>
             </div>
           </div>
-          <div className="mt-4 rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-900">
-            Review the extracted JSON, correct anything that looks off, save the
-            draft, then generate the final CDP.
+          <div className="rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/80 dark:bg-indigo-900/20 p-3.5 text-[13px] leading-relaxed text-indigo-800 dark:text-indigo-300">
+            Review the extracted data, correct anything that looks off, save the draft, then generate the final CDP document.
+          </div>
+          {/* Quick stats */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-gray-500">Plan Details</div>
+            <div className="text-[13px] text-slate-600 dark:text-gray-300 flex justify-between">
+              <span>POs/PSOs</span>
+              <span className="font-semibold">{plan.coPoMappings?.length ? `${plan.coPoMappings.length} rows` : "—"}</span>
+            </div>
+            <div className="text-[13px] text-slate-600 dark:text-gray-300 flex justify-between">
+              <span>Credit Hours</span>
+              <span className="font-semibold">{metadata.credits ? `L${metadata.credits.L ?? 0}T${metadata.credits.T ?? 0}P${metadata.credits.P ?? 0}` : "—"}</span>
+            </div>
           </div>
         </aside>
 
         {activeTab === "preview" ? (
           <div className="space-y-5">
             <article
-              className="rounded-lg border border-slate-200 bg-white p-6"
+              className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
               dangerouslySetInnerHTML={{ __html: buildPrintableCdp(plan) }}
             />
           </div>
         ) : (
-          <div className="rounded-lg border border-slate-200 bg-white p-5 sm:p-6">
+          <div className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 sm:p-6">
             <Section title="Course Metadata" icon={BookOpen}>
               <div className="grid gap-4 md:grid-cols-2">
                 <TextInput
@@ -414,12 +448,12 @@ export default function CdpReview() {
                 {FIXED_PROGRAM_OUTCOMES.map((outcome, index) => (
                   <div
                     key={`${outcome.id}-${index}`}
-                    className="flex flex-col gap-1 rounded-lg border border-slate-100 bg-slate-50/50 p-3 md:flex-row md:items-start md:gap-4"
+                    className="flex flex-col gap-1 rounded-lg border border-slate-100 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800/50 p-3 md:flex-row md:items-start md:gap-4"
                   >
-                    <span className="w-16 shrink-0 font-display text-sm font-bold text-indigo-600 uppercase">
+                    <span className="w-16 shrink-0 font-display text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase">
                       {outcome.id}
                     </span>
-                    <p className="text-sm leading-relaxed text-slate-600">
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-400">
                       {outcome.description}
                     </p>
                   </div>
@@ -464,13 +498,13 @@ export default function CdpReview() {
                 <table className="min-w-[760px] border-collapse text-sm">
                   <thead>
                     <tr>
-                      <th className="border border-slate-200 bg-slate-50 p-2 text-left">
+                      <th className="border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900 p-2 text-left dark:text-gray-300">
                         CO
                       </th>
                       {mappingKeys.map((key) => (
                         <th
                           key={key}
-                          className="border border-slate-200 bg-slate-50 p-2 text-center uppercase"
+                          className="border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900 p-2 text-center uppercase dark:text-gray-300"
                         >
                           {key}
                         </th>
@@ -480,11 +514,11 @@ export default function CdpReview() {
                   <tbody>
                     {(plan.coPoMappings ?? []).map((row, rowIndex) => (
                       <tr key={row.co}>
-                        <td className="border border-slate-200 p-2 font-semibold">
+                        <td className="border border-slate-200 dark:border-gray-700 p-2 font-semibold dark:text-gray-300">
                           {row.co}
                         </td>
                         {mappingKeys.map((key) => (
-                          <td key={key} className="border border-slate-200 p-1">
+                          <td key={key} className="border border-slate-200 dark:border-gray-700 p-1">
                             <input
                               value={row[key] ?? "-"}
                               onChange={(event) =>
@@ -495,7 +529,7 @@ export default function CdpReview() {
                                   })
                                 )
                               }
-                              className="h-8 w-full rounded border border-slate-200 text-center text-sm outline-none focus:border-indigo-400"
+                              className="h-8 w-full rounded border border-slate-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 text-center text-sm outline-none focus:border-indigo-400"
                             />
                           </td>
                         ))}
@@ -511,10 +545,10 @@ export default function CdpReview() {
                 {(plan.lecturePlan ?? []).map((lecture, index) => (
                   <div
                     key={`${lecture.classPeriod}-${index}`}
-                    className="rounded-lg border border-slate-200 p-4"
+                    className="rounded-lg border border-slate-200 dark:border-gray-700 dark:bg-gray-800/50 p-4"
                   >
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="text-sm font-bold text-slate-700">
+                      <span className="text-sm font-bold text-slate-700 dark:text-gray-300">
                         Session {index + 1}
                       </span>
                       <button
@@ -525,7 +559,7 @@ export default function CdpReview() {
                             plan.lecturePlan.filter((_, itemIndex) => itemIndex !== index)
                           )
                         }
-                        className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 dark:text-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600"
                         aria-label="Remove session"
                       >
                         <Trash2 size={16} />
@@ -641,7 +675,7 @@ export default function CdpReview() {
                       EMPTY_LECTURE,
                     ])
                   }
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700"
                 >
                   <Plus size={16} />
                   Add Session

@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import RootLayout from "./components/RootLayout";
 import LandingPage from "./LandingPage";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -11,8 +12,10 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/matrix" element={<CoPoMatrixDashboard />} />
-      <Route path="/cdp-review" element={<CdpReview />} />
+      <Route element={<RootLayout />}>
+        <Route path="/matrix" element={<CoPoMatrixDashboard />} />
+        <Route path="/cdp-review" element={<CdpReview />} />
+      </Route>
     </Routes>
   );
 }

@@ -1,7 +1,7 @@
 import { apiRequest } from "../lib/Api";
 
 const STORAGE_PREFIX = "acadplan_copo_matrix";
-const MOCK_MATRIX_URL = "/mock-data/copo-matrix.json";
+const MOCK_MATRIX_URL = "mock-data/cdp-plan.json";
 const shouldUseMockApi = import.meta.env.VITE_USE_MOCK_API !== "false";
 
 function normalizeMatrixResponse(payload) {

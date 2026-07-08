@@ -1,14 +1,360 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
- 
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
+/* ─────────────────────────────────────────────────────
+   DESIGN TOKENS
+   ───────────────────────────────────────────────────── */
+:root {
+  --c-indigo:   220 90% 56%;
+  --c-violet:   262 83% 58%;
+  --c-teal:     174 72% 45%;
+  --c-ink:      222 47% 11%;
+  --c-paper:    250 33% 98%;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+
+  --shadow-glow-indigo: 0 0 32px -8px hsl(var(--c-indigo) / 0.35);
+  --shadow-glow-violet: 0 0 32px -8px hsl(var(--c-violet) / 0.30);
+  --shadow-card:  0 4px 24px -6px rgba(15,23,42,0.10);
+  --shadow-card-hover: 0 16px 48px -12px rgba(15,23,42,0.18);
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 480ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─────────────────────────────────────────────────────
+   PERFORMANCE BASE
+   ───────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  /* Enable native smooth scroll on the compositor thread */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
- 
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  /* Prevent layout shift from scrollbar */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
- 
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--c-indigo) / 0.25); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--c-indigo) / 0.45); }
+
+/* ─────────────────────────────────────────────────────
+   GPU PROMOTION HELPERS
+   compositor-only: transform, opacity, filter, will-change
+   ───────────────────────────────────────────────────── */
+.will-transform { will-change: transform; }
+.will-opacity   { will-change: opacity; }
+.gpu            { transform: translateZ(0); backface-visibility: hidden; }
+
+/* ─────────────────────────────────────────────────────
+   COMPOSITOR-ONLY KEYFRAME ANIMATIONS
+   (no width/height/top/left — only transform + opacity + filter)
+   ───────────────────────────────────────────────────── */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes float-y-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%      { transform: translateY(-14px) rotate(1.5deg); }
+  66%      { transform: translateY(-6px) rotate(-1deg); }
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--c-indigo) / 0.4); }
+  50%      { box-shadow: 0 0 0 12px hsl(var(--c-indigo) / 0); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-cw {
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-ccw {
+  to { transform: rotate(-360deg); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(var(--orbit-r, 52px)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--orbit-r, 52px)) rotate(-360deg); }
+}
+@keyframes blink-colon {
+  0%, 49% { opacity: 1; }
+  50%,100% { opacity: 0.2; }
+}
+@keyframes border-rotate {
+  to { --angle: 360deg; }
+}
+@keyframes mesh-shift {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+@keyframes text-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes wave {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(1.08); }
+  100% { transform: scaleX(1); }
+}
+
+/* ─────────────────────────────────────────────────────
+   UTILITY CLASSES
+   ───────────────────────────────────────────────────── */
+.animate-float        { animation: float-y 3.6s ease-in-out infinite; }
+.animate-float-slow   { animation: float-y-slow 6s ease-in-out infinite; }
+.animate-fade-up      { animation: fade-up 0.6s cubic-bezier(0.4,0,0.2,1) both; }
+.animate-scale-in     { animation: scale-in 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+.animate-spin-slow    { animation: spin-slow 20s linear infinite; }
+.animate-spin-cw      { animation: spin-cw 12s linear infinite; }
+.animate-spin-ccw     { animation: spin-ccw 16s linear infinite; }
+.animate-pulse-glow   { animation: pulse-glow 2.4s cubic-bezier(0.4,0,0.6,1) infinite; }
+.animate-gradient     { animation: gradient-shift 6s ease infinite; background-size: 200% 200%; }
+.animate-blink-colon  { animation: blink-colon 1s step-start infinite; }
+.animate-shimmer      { animation: shimmer 2.2s linear infinite; }
+.animate-text-shimmer {
+  background: linear-gradient(105deg, hsl(var(--c-indigo)), hsl(var(--c-violet)), hsl(var(--c-teal)), hsl(var(--c-indigo)));
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 4s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────────
+   GLASSMORPHISM SYSTEM
+   ───────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+.glass-dark {
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.dark .glass-adaptive {
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.glass-adaptive {
+  background: rgba(255,255,255,0.70);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.55);
+}
+
+/* ─────────────────────────────────────────────────────
+   GRADIENT UTILITIES
+   ───────────────────────────────────────────────────── */
+.grad-brand {
+  background: linear-gradient(135deg,
+    hsl(var(--c-indigo)) 0%,
+    hsl(var(--c-violet)) 50%,
+    hsl(var(--c-teal)) 100%
+  );
+}
+.grad-brand-text {
+  background: linear-gradient(135deg,
+    hsl(var(--c-indigo)) 0%,
+    hsl(var(--c-violet)) 50%,
+    hsl(var(--c-teal)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.grad-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, hsl(var(--c-indigo) / 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 60% at 80% 80%, hsl(var(--c-teal) / 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 40% at 60% 10%, hsl(var(--c-violet) / 0.08) 0%, transparent 70%);
+}
+
+/* ─────────────────────────────────────────────────────
+   INTERACTIVE MICRO-ANIMATIONS
+   ───────────────────────────────────────────────────── */
+.btn-lift {
+  transition: transform var(--transition-spring), box-shadow var(--transition-base);
+}
+.btn-lift:hover  { transform: translateY(-2px); }
+.btn-lift:active { transform: translateY(0px); }
+
+.card-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Focus ring — accessible & beautiful */
+.focus-ring {
+  outline: none;
+  transition: box-shadow var(--transition-fast);
+}
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 3px hsl(var(--c-indigo) / 0.4);
+}
+
+/* Selection */
+::selection {
+  background: hsl(var(--c-indigo) / 0.2);
+  color: inherit;
+}
+
+/* ─────────────────────────────────────────────────────
+   DOTGRID NOISE TEXTURE
+   ───────────────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, hsl(var(--c-indigo)) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+.dot-grid-light {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.5) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* ─────────────────────────────────────────────────────
+   SHIMMER SKELETON LOADER
+   ───────────────────────────────────────────────────── */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: hsl(220 15% 90%);
+  border-radius: 6px;
+}
+.dark .skeleton {
+  background: hsl(220 15% 18%);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.5) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.8s ease infinite;
+}
+
+/* ─────────────────────────────────────────────────────
+   NOISE OVERLAY (pure CSS — no image file)
+   ───────────────────────────────────────────────────── */
+.noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  border-radius: inherit;
+}
+
+/* ─────────────────────────────────────────────────────
+   TABLE ENHANCEMENTS
+   ───────────────────────────────────────────────────── */
+.table-premium td, .table-premium th {
+  transition: background-color var(--transition-fast);
+}
+.table-premium tbody tr:hover td {
+  background-color: hsl(var(--c-indigo) / 0.04);
+}
+
+/* ─────────────────────────────────────────────────────
+   INPUT ENHANCEMENTS
+   ───────────────────────────────────────────────────── */
+.input-premium {
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
+}
+.input-premium:focus {
+  border-color: hsl(var(--c-indigo));
+  box-shadow: 0 0 0 3px hsl(var(--c-indigo) / 0.15), 0 1px 3px rgba(0,0,0,0.08);
+  outline: none;
+}
+
+/* ─────────────────────────────────────────────────────
+   STAGGER DELAY HELPERS
+   ───────────────────────────────────────────────────── */
+.stagger-1 { animation-delay: 80ms; }
+.stagger-2 { animation-delay: 160ms; }
+.stagger-3 { animation-delay: 240ms; }
+.stagger-4 { animation-delay: 320ms; }
+.stagger-5 { animation-delay: 400ms; }
+
+/* ─────────────────────────────────────────────────────
+   GRADIENT BORDER HACK (no extra DOM element needed)
+   ───────────────────────────────────────────────────── */
+.grad-border {
+  position: relative;
+  border-radius: var(--radius-lg);
+}
+.grad-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg,
+    hsl(var(--c-indigo)),
+    hsl(var(--c-violet)),
+    hsl(var(--c-teal))
+  );
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: -1;
+}
+.grad-border:hover::before { opacity: 1; }
+
+/* ─────────────────────────────────────────────────────
+   PRINT SAFETY
+   ───────────────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+}
