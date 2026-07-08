@@ -11,6 +11,7 @@ export default function SignUp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // TODO: wire this up to your backend's sign-up endpoint
     console.log("Create account with:", form);
   };
 
@@ -52,9 +53,9 @@ export default function SignUp() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-[13px] text-slate-500 dark:text-slate-400">
+      <p className="mt-6 text-center text-[13px] text-slate-500">
         Already have an account?{" "}
-        <Link to="/signin" className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+        <Link to="/signin" className="font-semibold text-indigo-600 hover:text-indigo-700">
           Sign in
         </Link>
       </p>

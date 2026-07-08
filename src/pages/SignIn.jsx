@@ -11,6 +11,7 @@ export default function SignIn() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // TODO: wire this up to your backend's sign-in endpoint
     console.log("Sign in with:", form);
   };
 
@@ -37,7 +38,7 @@ export default function SignIn() {
         />
 
         <div className="flex justify-end">
-          <a href="#" className="text-[12.5px] font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+          <a href="#" className="text-[12.5px] font-medium text-indigo-600 hover:text-indigo-700">
             Forgot password?
           </a>
         </div>
@@ -50,9 +51,9 @@ export default function SignIn() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-[13px] text-slate-500 dark:text-slate-400">
+      <p className="mt-6 text-center text-[13px] text-slate-500">
         Don&apos;t have an account?{" "}
-        <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+        <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-700">
           Sign up
         </Link>
       </p>

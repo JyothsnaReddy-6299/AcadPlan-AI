@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative bg-ivory pt-48 sm:pt-56 pb-32 sm:pb-40 px-4 text-center dark:bg-slate-900">
+    <section className="relative bg-ivory pt-48 sm:pt-56 pb-32 sm:pb-40 px-4 text-center">
       {/* dot-grid, contained to this section only */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.04]"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
           backgroundImage: "radial-gradient(circle, #312E81 1.2px, transparent 1.2px)",
           backgroundSize: "28px 28px",
@@ -22,7 +22,7 @@ export default function Hero() {
           AcadPlan AI
         </h1>
 
-        <p className="mt-4 text-[15px] sm:text-base text-slate-500 font-medium dark:text-slate-400">
+        <p className="mt-4 text-[15px] sm:text-base text-slate-500 font-medium">
           plan your academics in few steps
         </p>
 
