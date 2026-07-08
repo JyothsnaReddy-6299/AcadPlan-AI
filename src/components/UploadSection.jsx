@@ -4,32 +4,31 @@ import { motion, useMotionValue, animate } from "framer-motion";
 import { UploadCloud, FileText, ArrowRight, Network, CheckCircle2, XCircle } from "lucide-react";
 import { uploadSyllabus } from "../lib/Api";
 
-// Icons that radiate outward from the upload button on hover.
 const RING_ICONS = [FileText, ArrowRight, Network, FileText, ArrowRight, Network];
-const RADIUS = 78; // px, how far each icon travels from the button's center
-const DEG_PER_SEC = 45; // constant angular speed — same every single hover, no drift
+const RADIUS = 78;
+const DEG_PER_SEC = 45;
 
 export default function UploadSection() {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
-  const [status, setStatus] = useState("idle"); // idle | uploading | success | error
+  const [status, setStatus] = useState("idle");
   const [fileName, setFileName] = useState("");
-  const rotate = useMotionValue(0); // drives the ring's rotation directly
+  const rotate = useMotionValue(0);
   const activeAnimation = useRef(null);
   const fileInputRef = useRef(null);
 
   const handleEnter = () => {
     setHovered(true);
     const current = rotate.get();
-    const spins = 400; // effectively endless for any realistic hover duration
+    const spins = 400;
     const target = current + 360 * spins;
-    const duration = (360 * spins) / DEG_PER_SEC; // always the same angular speed
+    const duration = (360 * spins) / DEG_PER_SEC;
     activeAnimation.current = animate(rotate, target, { duration, ease: "linear" });
   };
 
   const handleLeave = () => {
     setHovered(false);
-    activeAnimation.current?.stop(); // freezes the ring exactly where it is — no snap-back
+    activeAnimation.current?.stop();
   };
 
   useEffect(() => () => activeAnimation.current?.stop(), []);
@@ -58,7 +57,7 @@ export default function UploadSection() {
   const handleDragOver = (e) => e.preventDefault();
 
   return (
-    <section className="relative bg-white px-4 sm:px-6 py-20 sm:py-28">
+    <section className="relative bg-white px-4 sm:px-6 py-20 sm:py-28 dark:bg-slate-950">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -66,13 +65,12 @@ export default function UploadSection() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="mx-auto max-w-4xl"
       >
-        <div className="rounded-3xl border border-white/60 bg-white/60 backdrop-blur-2xl shadow-[0_8px_40px_-12px_rgba(79,70,229,0.16)] p-6 sm:p-12">
+        <div className="rounded-3xl border border-white/60 bg-white/60 backdrop-blur-2xl shadow-[0_8px_40px_-12px_rgba(79,70,229,0.16)] p-6 sm:p-12 dark:border-slate-800/60 dark:bg-slate-900/60 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.4)]">
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="rounded-2xl border-2 border-dashed border-indigo-200/70 bg-white/50 px-6 py-14 sm:py-16 text-center"
+            className="rounded-2xl border-2 border-dashed border-indigo-200/70 bg-white/50 px-6 py-14 sm:py-16 text-center dark:border-indigo-700/50 dark:bg-slate-900/30"
           >
-            {/* hidden native input — the styled button just triggers this */}
             <input
               ref={fileInputRef}
               type="file"
@@ -81,13 +79,11 @@ export default function UploadSection() {
               className="hidden"
             />
 
-            {/* Upload button with radiating icon ring */}
             <div
               className="relative mx-auto grid h-[140px] w-[140px] place-items-center"
               onMouseEnter={handleEnter}
               onMouseLeave={handleLeave}
             >
-              {/* rotating ring — constant speed, bound directly to a motion value */}
               <motion.div
                 style={{ rotate, transformOrigin: "50% 50%" }}
                 className="absolute inset-0"
@@ -100,19 +96,17 @@ export default function UploadSection() {
                       className="absolute left-1/2 top-1/2 transition-all duration-500 ease-out"
                       style={{
                         opacity: hovered ? 0.55 : 0,
-                        // emerges from the button's center (0) out to RADIUS on hover
                         transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${
                           hovered ? RADIUS : 0
                         }px) rotate(${-angle}deg)`,
                       }}
                     >
-                      <Icon size={16} className="text-indigo-500" strokeWidth={2} />
+                      <Icon size={16} className="text-indigo-500 dark:text-indigo-400" strokeWidth={2} />
                     </span>
                   );
                 })}
               </motion.div>
 
-              {/* the button itself */}
               <button
                 type="button"
                 onClick={handleBrowseClick}
@@ -122,32 +116,31 @@ export default function UploadSection() {
               </button>
             </div>
 
-            <h3 className="mt-5 font-display font-bold text-lg text-ink">
+            <h3 className="mt-5 font-display font-bold text-lg text-ink dark:text-white">
               Upload Syllabus
             </h3>
-            <p className="mt-1.5 text-[13.5px] text-slate-500">
+            <p className="mt-1.5 text-[13.5px] text-slate-500 dark:text-slate-400">
               Drag and drop your syllabus document here, or click to browse
             </p>
-            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 font-mono text-[11px] text-slate-500">
+            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 font-mono text-[11px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
               Supports PDF, DOCX
             </p>
 
-            {/* upload status feedback */}
             {status !== "idle" && (
               <div className="mt-5 flex items-center justify-center gap-2 text-[13px]">
                 {status === "uploading" && (
-                  <span className="text-slate-500">Uploading {fileName}…</span>
+                  <span className="text-slate-500 dark:text-slate-400">Uploading {fileName}…</span>
                 )}
                 {status === "success" && (
                   <>
-                    <CheckCircle2 size={16} className="text-teal-600" />
-                    <span className="text-teal-700">{fileName} uploaded successfully</span>
+                    <CheckCircle2 size={16} className="text-teal-600 dark:text-teal-400" />
+                    <span className="text-teal-700 dark:text-teal-300">{fileName} uploaded successfully</span>
                   </>
                 )}
                 {status === "error" && (
                   <>
                     <XCircle size={16} className="text-red-500" />
-                    <span className="text-red-500">
+                    <span className="text-red-500 dark:text-red-400">
                       Couldn't reach the server — check it's running
                     </span>
                   </>

@@ -15,17 +15,15 @@ export function createDefaultMatrix() {
   return matrix;
 }
 
-// Visual styling per mapping weight — used by both the cell button and
-// the options inside its dropdown so the whole thing stays consistent.
 export function getCellStyles(value) {
   switch (value) {
     case "1":
-      return "text-emerald-700 border-emerald-200 bg-emerald-100/80";
+      return "text-emerald-700 border-emerald-200 bg-emerald-100/80 dark:text-emerald-300 dark:border-emerald-800 dark:bg-emerald-950/60";
     case "2":
-      return "text-sky-700 border-sky-300 bg-sky-100/80";
+      return "text-sky-700 border-sky-300 bg-sky-100/80 dark:text-sky-300 dark:border-sky-800 dark:bg-sky-950/60";
     case "3":
-      return "text-white border-indigo-600 bg-indigo-600";
+      return "text-white border-indigo-600 bg-indigo-600 dark:border-indigo-500 dark:bg-indigo-600";
     default:
-      return "text-slate-400 border-slate-200 border-dashed bg-white/40";
+      return "text-slate-400 border-slate-200 border-dashed bg-white/40 dark:text-slate-500 dark:border-slate-700 dark:bg-slate-800/40";
   }
 }
