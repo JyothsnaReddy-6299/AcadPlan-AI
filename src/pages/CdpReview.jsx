@@ -8,8 +8,10 @@ import {
   Plus,
   Save,
   Trash2,
+  Layers,
 } from "lucide-react";
 import { useCdpPlan } from "../hooks/useCdpPlan";
+import ConceptMapGenerator from "../components/ConceptMapGenerator";
 
 const COURSE_ID = "23CSE201";
 
@@ -127,6 +129,219 @@ function joinList(value) {
   return Array.isArray(value) ? value.join(", ") : value ?? "";
 }
 
+function buildPrintableConceptMapSvg(plan) {
+  if (!plan?.conceptMap?.nodes) {
+    return `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 350px; border: 2px dashed #ccc; border-radius: 8px; margin: 20px 0;">
+        <p style="font-size: 14px; font-weight: bold; color: #666; margin: 0 0 8px;">No Concept Map Generated</p>
+        <p style="font-size: 12px; color: #888; margin: 0;">Please generate the concept map in the Concept Map tab first.</p>
+      </div>
+    `;
+  }
+
+  const nodes = plan.conceptMap.nodes;
+  const rootNode = nodes.find(n => n.type === "root" || n.id === "root");
+  if (!rootNode) return "";
+
+  const centerX = 500;
+  const centerY = 300;
+  const outerNodes = nodes.filter(n => n.id !== rootNode.id);
+
+  // Symmetrical slots coordinates radiating around center (X: 320px spacing, Y: 180px spacing)
+  const dx = 320;
+  const dy = 180;
+  const slots = [
+    { x: centerX, y: centerY - dy },      // 1. Top-Center
+    { x: centerX + dx, y: centerY - dy }, // 2. Top-Right
+    { x: centerX + dx, y: centerY },      // 3. Middle-Right
+    { x: centerX + dx, y: centerY + dy }, // 4. Bottom-Right
+    { x: centerX, y: centerY + dy },      // 5. Bottom-Center
+    { x: centerX - dx, y: centerY + dy }, // 6. Bottom-Left
+    { x: centerX - dx, y: centerY },      // 7. Middle-Left
+    { x: centerX - dx, y: centerY - dy }, // 8. Top-Left
+  ];
+
+  let edgesStr = "";
+  let nodesStr = "";
+
+  // Helper to split paragraph text into short lines
+  const splitText = (text, maxChars) => {
+    const words = text.split(" ");
+    const lines = [];
+    let currentLine = "";
+    words.forEach(word => {
+      if ((currentLine + " " + word).length > maxChars) {
+        lines.push(currentLine.trim());
+        currentLine = word;
+      } else {
+        currentLine += " " + word;
+      }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+    return lines;
+  };
+
+  outerNodes.forEach((node, idx) => {
+    let slotIdx = idx % slots.length;
+    if (outerNodes.length <= 4) {
+      slotIdx = (idx * 2) % slots.length;
+    }
+    const sx = slots[slotIdx].x;
+    const sy = slots[slotIdx].y;
+
+    // Calculate the boundary connection point on the border of the card
+    let tx = sx;
+    let ty = sy;
+    if (sx > centerX) {
+      tx = sx - 115; // Left edge of right-hand cards
+    } else if (sx < centerX) {
+      tx = sx + 115; // Right edge of left-hand cards
+    } else if (sy < centerY) {
+      ty = sy + 50;  // Bottom edge of top cards
+    } else if (sy > centerY) {
+      ty = sy - 50;  // Top edge of bottom cards
+    }
+
+    // Draw edge (thin solid black line with arrowhead pointing from center)
+    edgesStr += `
+      <line 
+        x1="${centerX}" y1="${centerY}" 
+        x2="${tx}" y2="${ty}" 
+        stroke="#1e293b" 
+        stroke-width="1.5" 
+        marker-end="url(#arrow)" 
+      />
+    `;
+
+    // Colors mapping corresponding to screen themes
+    const themeColors = {
+      yellow: { fill: "#fef08a", border: "#fbbf24", badge: "#eab308", glow: "rgba(234,179,8,0.12)" },
+      orange: { fill: "#ffedd5", border: "#f97316", badge: "#ea580c", glow: "rgba(249,115,22,0.12)" },
+      pink: { fill: "#fce7f3", border: "#f472b6", badge: "#db2777", glow: "rgba(236,72,153,0.12)" },
+      purple: { fill: "#f3e8ff", border: "#c084fc", badge: "#9333ea", glow: "rgba(168,85,247,0.12)" },
+      red: { fill: "#fee2e2", border: "#f87171", badge: "#dc2626", glow: "rgba(239,68,68,0.12)" },
+      teal: { fill: "#ccfbf1", border: "#2dd4bf", badge: "#0d9488", glow: "rgba(20,184,166,0.12)" },
+      cyan: { fill: "#ecfeff", border: "#22d3ee", badge: "#0891b2", glow: "rgba(6,182,212,0.12)" },
+      blue: { fill: "#dbeafe", border: "#60a5fa", badge: "#2563eb", glow: "rgba(59,130,246,0.12)" },
+    };
+    const color = themeColors[node.themeColor || "yellow"] || themeColors.yellow;
+
+    const w = 230;
+    const h = 100;
+    const rx = sx - w / 2;
+    const ry = sy - h / 2;
+
+    const desc = node.description || "";
+    const lines = splitText(desc, 38);
+
+    nodesStr += `
+      <!-- Outer Card Box -->
+      <g>
+        <rect 
+          x="${rx}" y="${ry}" 
+          width="${w}" height="${h}" 
+          rx="28" ry="28" 
+          fill="#ffffff" 
+          stroke="${color.badge}" 
+          stroke-width="2" 
+          style="filter: drop-shadow(0px 6px 12px ${color.glow});" 
+        />
+        
+        <!-- Badge -->
+        <circle cx="${rx}" cy="${sy}" r="15" fill="${color.badge}" stroke="#ffffff" stroke-width="2.5" />
+        <text x="${rx}" y="${sy + 3.5}" fill="#ffffff" font-size="9px" font-weight="900" font-family="Arial, sans-serif" text-anchor="middle">${node.badgeNumber || idx + 1}</text>
+        
+        <!-- Title Header -->
+        <text 
+          x="${sx}" y="${ry + 26}" 
+          fill="#1e293b" 
+          font-size="9.5px" 
+          font-weight="bold" 
+          font-family="Arial, sans-serif" 
+          text-anchor="middle"
+        >
+          ${html(node.label)}
+        </text>
+        
+        <!-- Wrapped Description -->
+        ${lines.slice(0, 3).map((line, lidx) => `
+          <text 
+            x="${sx}" y="${ry + 43 + lidx * 13}" 
+            fill="#64748b" 
+            font-size="8px" 
+            font-family="Arial, sans-serif" 
+            text-anchor="middle"
+          >
+            ${html(line)}
+          </text>
+        `).join("")}
+      </g>
+    `;
+  });
+
+  // Central Node
+  const codeText = rootNode.code || plan.courseMetadata?.code || "COURSE";
+  const titleText = rootNode.title || (plan.courseMetadata?.name || "Subject").toUpperCase();
+  const titleLines = splitText(titleText, 25);
+
+  const cw = 240;
+  const ch = 90;
+  const crx = centerX - cw / 2;
+  const cry = centerY - ch / 2;
+
+  nodesStr += `
+    <!-- Center Node (Glowing Card Box matching screen view) -->
+    <g>
+      <rect 
+        x="${crx}" y="${cry}" 
+        width="${cw}" height="${ch}" 
+        rx="24" ry="24" 
+        fill="#ffffff" 
+        stroke="#4f46e5" 
+        stroke-width="2.5" 
+        style="filter: drop-shadow(0px 8px 18px rgba(79,70,229,0.18));" 
+      />
+      <text 
+        x="${centerX}" y="${centerY - 8}" 
+        fill="#1e1b4b" 
+        font-size="12px" 
+        font-weight="900" 
+        font-family="Arial, sans-serif" 
+        text-anchor="middle"
+      >
+        ${html(codeText)}
+      </text>
+      ${titleLines.slice(0, 2).map((line, lidx) => `
+        <text 
+          x="${centerX}" y="${centerY + 10 + lidx * 11}" 
+          fill="#475569" 
+          font-size="8px" 
+          font-weight="bold" 
+          font-family="Arial, sans-serif" 
+          text-anchor="middle"
+        >
+          ${html(line)}
+        </text>
+      `).join("")}
+    </g>
+  `;
+
+  return `
+    <div style="display: flex; justify-content: center; align-items: center; margin: 15px 0;">
+      <svg width="100%" height="450" viewBox="0 0 1000 600" style="background: #fafaf9; border: 1px solid #cbd5e1; border-radius: 20px; max-width: 750px;">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#1e293b" />
+          </marker>
+        </defs>
+        ${edgesStr}
+        ${nodesStr}
+      </svg>
+    </div>
+  `;
+}
+
+
 function printCdp(plan) {
   const htmlStr = buildPrintableCdp(plan);
   const win = window.open("", "_blank", "noopener,noreferrer");
@@ -141,115 +356,616 @@ function buildPrintableCdp(plan) {
   const credits = metadata.credits ?? {};
   const mappingKeys = getMappingKeys(plan);
   const evaluation = plan.evaluationAndGrading ?? {};
+  const courseOutcomes = plan.courseOutcomes ?? [];
+  const lecturePlan = plan.lecturePlan ?? [];
+
+  // Group lecture plan by units for clean formatting
+  const lecturesByUnit = {};
+  lecturePlan.forEach(lecture => {
+    const unitVal = lecture.unit || 1;
+    if (!lecturesByUnit[unitVal]) lecturesByUnit[unitVal] = [];
+    lecturesByUnit[unitVal].push(lecture);
+  });
 
   return `
     <!doctype html>
     <html>
       <head>
-        <title>${metadata.code ?? "Course"} CDP</title>
+        <title>${metadata.code ?? "Course"} - Course Delivery Plan</title>
         <style>
-          body { font-family: Arial, sans-serif; color: #111827; margin: 28px; }
-          h1 { font-size: 22px; margin: 0 0 4px; }
-          h2 { font-size: 15px; margin: 24px 0 8px; }
-          p { margin: 4px 0; line-height: 1.5; }
-          table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-          th, td { border: 1px solid #cbd5e1; padding: 6px; font-size: 11px; vertical-align: top; }
-          th { background: #eef2ff; }
-          pre { white-space: pre-wrap; border: 1px solid #cbd5e1; padding: 10px; font-size: 11px; }
-          .muted { color: #64748b; }
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          body {
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            font-family: "Times New Roman", Times, serif;
+            color: #000000;
+          }
+          
+          /* Page Container */
+          .page-container {
+            background-color: #ffffff;
+            width: 210mm;
+            height: 297mm;
+            padding: 15mm;
+            margin: 10px auto;
+            box-sizing: border-box;
+            position: relative;
+            page-break-after: always;
+            break-after: page;
+          }
+          
+          @media print {
+            body {
+              background-color: #ffffff;
+              margin: 0;
+              padding: 0;
+            }
+            .page-container {
+              margin: 0;
+              border: none;
+              box-shadow: none;
+              page-break-after: always;
+              break-after: page;
+            }
+          }
+
+          /* Double line border layout */
+          .double-border {
+            border: 4px double #000000;
+            height: 100%;
+            width: 100%;
+            padding: 8mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+          }
+
+          /* Header style */
+          .official-logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+          }
+          .official-logo-header svg {
+            flex-shrink: 0;
+          }
+          .logo-text-block {
+            text-align: center;
+          }
+          .univ-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #991b1b;
+            margin: 0;
+            letter-spacing: 0.5px;
+          }
+          .school-title {
+            font-size: 12.5px;
+            font-weight: bold;
+            margin: 2px 0 0 0;
+            color: #000000;
+          }
+          
+          .cdp-banner {
+            background-color: #e2e8f0;
+            border: 1px solid #000000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 6.5px;
+            margin-bottom: 12px;
+          }
+
+          /* Tables styling */
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+          }
+          th, td {
+            border: 1px solid #000000;
+            padding: 5px 6px;
+            font-size: 10px;
+            vertical-align: middle;
+          }
+          th {
+            background-color: #e2e8f0;
+            font-weight: bold;
+            text-align: center;
+          }
+          
+          .label-col {
+            font-weight: bold;
+            width: 25%;
+          }
+          .val-col {
+            width: 25%;
+          }
+          
+          .section-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 14px 0 6px 0;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 2px;
+            text-transform: uppercase;
+          }
+
           .center { text-align: center; }
+          .justify { text-align: justify; }
+          
+          /* Footer: Right-aligned italics, no line */
+          .page-footer-block {
+            position: absolute;
+            bottom: 8mm;
+            left: 8mm;
+            right: 8mm;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 9.5px;
+            font-style: italic;
+            font-family: "Times New Roman", Times, serif;
+          }
+
+          /* Signatures */
+          .sig-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+          }
+          .sig-box {
+            text-align: center;
+            width: 22%;
+            font-size: 10px;
+            font-weight: bold;
+          }
+          .sig-line {
+            border-top: 1px solid #000000;
+            margin-bottom: 5px;
+            padding-top: 3px;
+          }
         </style>
       </head>
       <body>
-        <h1>Course Delivery Plan</h1>
-        <p><strong>${html(metadata.code)}</strong> - ${html(metadata.name)}</p>
-        <p class="muted">Academic Year: ${html(metadata.academicYear || "Not set")} | Mentor: ${html(metadata.courseMentor || "Not set")}</p>
-        <p>Credits: L-${html(credits.L)}, T-${html(credits.T)}, P-${html(credits.P)}, C-${html(credits.C)}</p>
-        <p>Pre-requisites: ${html(metadata.preRequisites)}</p>
 
-        <h2>Program Outcomes / PSOs</h2>
-        <table>
-          <tbody>
-            ${FIXED_PROGRAM_OUTCOMES
-              .map(
-                (outcome) =>
-                  `<tr><th>${html(outcome.id)}</th><td>${html(outcome.description)}</td></tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
+        <!-- PAGE 1: COVER PAGE -->
+        <div class="page-container">
+          <div class="double-border">
+            <div class="official-logo-header">
+              <svg width="45" height="45" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#991b1b" stroke-width="4" />
+                <circle cx="50" cy="50" r="37" fill="#991b1b" />
+                <path d="M 50 18 L 50 82 M 18 50 L 82 50 M 27 27 L 73 73 M 27 73 L 73 27" stroke="#ffffff" stroke-width="2.5" />
+                <circle cx="50" cy="50" r="16" fill="#ffffff" stroke="#991b1b" stroke-width="2.5" />
+                <text x="50" y="55" text-anchor="middle" font-size="15" font-weight="bold" fill="#991b1b" font-family="Arial">A</text>
+              </svg>
+              <div class="logo-text-block">
+                <h1 class="univ-title">AMRITA VISHWA VIDYAPEETHAM</h1>
+                <h2 class="school-title">Amrita School of Computing, Chennai</h2>
+              </div>
+            </div>
 
-        <h2>Course Outcomes</h2>
-        <table>
-          <tbody>
-            ${(plan.courseOutcomes ?? [])
-              .map((co) => `<tr><th>${html(co.id)}</th><td>${html(co.description)}</td></tr>`)
-              .join("")}
-          </tbody>
-        </table>
+            <div class="cdp-banner">Course Delivery Plan</div>
 
-        <h2>CO-PO/PSO Mapping</h2>
-        <table>
-          <thead><tr><th>CO</th>${mappingKeys
-            .map((key) => `<th>${html(key.toUpperCase())}</th>`)
-            .join("")}</tr></thead>
-          <tbody>
-            ${(plan.coPoMappings ?? [])
-              .map(
-                (row) =>
-                  `<tr><th>${html(row.co)}</th>${mappingKeys
-                    .map((key) => `<td class="center">${html(row[key] ?? "-")}</td>`)
-                    .join("")}</tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
+            <!-- Course Metadata Table -->
+            <table>
+              <tbody>
+                <tr>
+                  <td class="label-col">Course Code : Course Name</td>
+                  <td class="val-col"><strong>${html(metadata.code ?? "23CSE201")}: ${html(metadata.name ?? "Procedural Programming using C")}</strong></td>
+                  <td class="label-col">Program</td>
+                  <td class="val-col">${html(metadata.program ?? "CSE-CT")}</td>
+                </tr>
+                <tr>
+                  <td class="label-col">L - T - P - C</td>
+                  <td class="val-col">${html(credits.L ?? 3)}-${html(credits.T ?? 0)}-${html(credits.P ?? 2)}-${html(credits.C ?? 4)}</td>
+                  <td class="label-col">Semester / Year</td>
+                  <td class="val-col">${html(metadata.semesterYear ?? "III/II")}</td>
+                </tr>
+                <tr>
+                  <td class="label-col">Name(s) of the Faculty</td>
+                  <td class="val-col">${html(metadata.facultyNames ?? "Dr.R.Annamalai\nMr. M. Rajamanogaran").replace(/\n/g, "<br />")}</td>
+                  <td class="label-col">Pre-requisite</td>
+                  <td class="val-col">${html(metadata.preRequisites ?? "NIL")}</td>
+                </tr>
+                <tr>
+                  <td class="label-col">Course Mentor</td>
+                  <td class="val-col">${html(metadata.courseMentor ?? "Dr.R.Annamalai")}</td>
+                  <td class="label-col">Academic Year</td>
+                  <td class="val-col">${html(metadata.academicYear ?? "2026-2027")}</td>
+                </tr>
+                <tr>
+                  <td class="label-col">Course Overview</td>
+                  <td class="val-col" colspan="3" class="justify">${html(metadata.courseOverview ?? "This course aims to provide the knowledge of programming principles to the students through C programming language and develop applications using Arduino.")}</td>
+                </tr>
+              </tbody>
+            </table>
 
-        <h2>Lecture Plan</h2>
-        <table>
-          <thead>
-            <tr><th>Unit</th><th>Class Period</th><th>Topic</th><th>Mode of Teaching</th><th>In-class Activity</th><th>Out-class Activity</th><th>CO Mapping</th><th>Reference</th></tr>
-          </thead>
-          <tbody>
-            ${(plan.lecturePlan ?? [])
-              .map(
-                (row) =>
-                  `<tr><td>${html(row.unit)}</td><td>${html(row.classPeriod)}</td><td>${html(row.topic)}</td><td>${html(row.modeOfTeaching)}</td><td>${html(row.inClassActivity)}</td><td>${html(row.outClassActivity)}</td><td>${html(joinList(row.coMapping))}</td><td>${html(joinList(row.reference))}</td></tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
+            <!-- Course Objectives and Course Outcomes side-by-side -->
+            <div style="flex: 1; display: flex; flex-direction: column;">
+              <table style="width: 100%; margin-top: 5px; border-collapse: collapse; flex: 1;">
+                <thead>
+                  <tr>
+                    <th colspan="2" style="width: 50%;">Course Objectives</th>
+                    <th colspan="2" style="width: 50%;">Course Outcomes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${courseOutcomes.map((co, cidx) => {
+                    if (cidx === 0) {
+                      return `
+                        <tr>
+                          <td style="width: 4%; text-align: center; vertical-align: top; padding: 6px;" rowspan="${courseOutcomes.length}">1</td>
+                          <td style="width: 46%; vertical-align: top; text-align: justify; padding: 6px; line-height: 1.45;" rowspan="${courseOutcomes.length}">
+                            This course aims to provide the procedural/imperative programming principles to the students through C programming language. The language will be taught in the context of physical computing using Arduino.
+                          </td>
+                          <td style="width: 6%; text-align: center; font-weight: bold; background-color: #f8fafc; padding: 6px; vertical-align: top;">${html(co.id)}</td>
+                          <td style="width: 44%; text-align: justify; padding: 6px; vertical-align: top; line-height: 1.45;">${html(co.description)}</td>
+                        </tr>
+                      `;
+                    } else {
+                      return `
+                        <tr>
+                          <td style="text-align: center; font-weight: bold; background-color: #f8fafc; padding: 6px; vertical-align: top;">${html(co.id)}</td>
+                          <td style="text-align: justify; padding: 6px; vertical-align: top; line-height: 1.45;">${html(co.description)}</td>
+                        </tr>
+                      `;
+                    }
+                  }).join("")}
+                </tbody>
+              </table>
+            </div>
 
-        <h2>Evaluation And Grading</h2>
-        <p>Total Marks: ${html(evaluation.totalMarks)}</p>
-        <table>
-          <thead><tr><th>Component</th><th>Marks</th><th>Type</th></tr></thead>
-          <tbody>
-            ${(evaluation.components ?? [])
-              .map(
-                (component) =>
-                  `<tr><td>${html(component.name)}</td><td class="center">${html(component.marks)}</td><td>${html(component.type)}</td></tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
+            <div class="page-footer-block">
+              <span>Page 1 of 12</span>
+            </div>
+          </div>
+        </div>
 
-        <h2>Threshold</h2>
-        <table>
-          <thead><tr><th>Level</th><th>Target Percentage</th><th>Student Percentage</th></tr></thead>
-          <tbody>
-            ${(evaluation.threshold ?? [])
-              .map(
-                (row) =>
-                  `<tr><td class="center">${html(row.level)}</td><td class="center">${html(row.targetPercentage)}</td><td class="center">${html(row.studentPercentage)}</td></tr>`
-              )
-              .join("")}
-          </tbody>
-        </table>
+        <!-- PAGE 2: SYLLABUS PAGE -->
+        <div class="page-container">
+          <div class="double-border">
+            <h3 class="section-title" style="margin-top: 0;">Syllabus</h3>
+            
+            <div style="margin-bottom: 12px; font-size: 11px; line-height: 1.4;" class="justify">
+              <strong style="font-size: 11.5px; text-decoration: underline;">Unit 1</strong><br />
+              Review of Physical Computing, Understanding Arduino Hardware and Software Architecture - Verifying Hardware and Software - Loading and Running your First Program.<br />
+              Introduction to C - Structure of C programs - Data types - I/O - control structures.
+            </div>
+
+            <div style="margin-bottom: 12px; font-size: 11px; line-height: 1.4;" class="justify">
+              <strong style="font-size: 11.5px; text-decoration: underline;">Unit 2</strong><br />
+              Arrays - Functions - Storage Classes and Scope - Recursion - Pointers: Introduction, pointer arithmetic, arrays and pointers, pointer to functions, dynamic memory allocation.
+            </div>
+
+            <div style="margin-bottom: 16px; font-size: 11px; line-height: 1.4;" class="justify">
+              <strong style="font-size: 11.5px; text-decoration: underline;">Unit 3</strong><br />
+              Structures, Unions and Data Storage - Strings: fixed length and variable length strings, strings and characters, string manipulation functions - Files and Streams - C Preprocessor - Command line arguments.
+            </div>
+
+            <h3 class="section-title">Textbook(s)</h3>
+            <p style="font-size: 11px; margin: 0 0 16px 0; font-style: italic;">
+              Jack Purdum, “Beginning C for Arduino”, Second Edition, APress, 2015.
+            </p>
+
+            <h3 class="section-title">Reference(s)</h3>
+            <ol style="font-size: 11px; margin: 0; padding-left: 20px; line-height: 1.4;">
+              <li style="margin-bottom: 6px;">Peter Linz and Tony Crawford, “C in a Nutshell: The Definitive Reference”, Second Edition, O'Reily Media, 2016.</li>
+              <li style="margin-bottom: 6px;">Jens Gustedt, “Modern C”, Manning Publications, 2019.</li>
+              <li style="margin-bottom: 6px;">Robert C. Seacord, Effective C - “An Introduction to Professional C Programming”, No Starch Press, 2020.</li>
+              <li style="margin-bottom: 6px;">Daniel Gookin, “Tiny C Projects”, Manning Publications, 2022.</li>
+            </ol>
+
+            <div class="page-footer-block">
+              <span>Page 2 of 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 3: CONCEPT MAP PAGE -->
+        <div class="page-container">
+          <div class="double-border" style="display: flex; flex-direction: column;">
+            <h3 class="section-title" style="margin-top: 0; margin-bottom: 5px;">Concept Map</h3>
+
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+              ${buildPrintableConceptMapSvg(plan)}
+            </div>
+
+            <div class="page-footer-block">
+              <span>Page 3 of 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 4: EVALUATION & grading & PO DESCRIPTIONS -->
+        <div class="page-container">
+          <div class="double-border">
+            <h3 class="section-title" style="margin-top: 0;">Evaluation and Grading</h3>
+            
+            <table>
+              <thead>
+                <tr>
+                  <th colspan="3">Internal (70)</th>
+                  <th rowspan="2">External (30)</th>
+                  <th rowspan="2">Total</th>
+                </tr>
+                <tr>
+                  <th>Components</th>
+                  <th>Marks</th>
+                  <th>Total Marks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Periodicals (Mid-Term Exam)</td>
+                  <td class="center">20</td>
+                  <td class="center" rowspan="2">20</td>
+                  <td class="center" rowspan="6"><strong>End Semester: 30</strong></td>
+                  <td class="center" rowspan="6"><strong>Internal + External = 100</strong></td>
+                </tr>
+                <tr>
+                  <td>Mid Sem Lab Assessment</td>
+                  <td class="center">15</td>
+                </tr>
+                <tr>
+                  <td>End Sem Lab Assessment</td>
+                  <td class="center">15</td>
+                  <td class="center" rowspan="4">50</td>
+                </tr>
+                <tr>
+                  <td>Lab Activity Sheets [Basics]</td>
+                  <td class="center">10</td>
+                </tr>
+                <tr>
+                  <td>Classroom Participation</td>
+                  <td class="center">05</td>
+                </tr>
+                <tr>
+                  <td>Quiz [2]</td>
+                  <td class="center">05</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title">Programme Outcome (PO)</h3>
+            <div style="flex: 1; overflow-y: auto; font-size: 9.5px; line-height: 1.35; padding-right: 2px;">
+              ${FIXED_PROGRAM_OUTCOMES.slice(0, 8).map(po => `
+                <div style="margin-bottom: 6px;">
+                  <strong style="color: #4f46e5;">${po.id}:</strong> ${po.description}
+                </div>
+              `).join("")}
+              <div style="border-top: 1px dashed #ccc; margin: 8px 0; padding-top: 5px;">
+                ${FIXED_PROGRAM_OUTCOMES.slice(8).map(po => `
+                  <div style="margin-bottom: 5px;">
+                    <strong>${po.id}:</strong> ${po.description}
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="page-footer-block">
+              <span>Page 4 of 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 5: CO-PO AFFINITY MAP -->
+        <div class="page-container">
+          <div class="double-border">
+            <h3 class="section-title" style="margin-top: 0;">CO – PO Affinity Map</h3>
+            
+            <p style="font-size: 11px; margin: 0 0 15px 0;" class="justify">
+              The strength of correlation is mapped from 3 to 1: <strong>3 – Strong, 2 – Moderate, 1 – Weak, "-" – No Correlation</strong>.
+            </p>
+
+            <table style="margin-top: 15px;">
+              <thead>
+                <tr>
+                  <th>CO / PO / PSO</th>
+                  ${mappingKeys.map(k => `<th>${k.toUpperCase()}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${(plan.coPoMappings ?? []).map(row => `
+                  <tr>
+                    <td class="center" style="font-weight: bold; background-color: #f8fafc;">${row.co}</td>
+                    ${mappingKeys.map(key => `<td class="center">${row[key] ?? "-"}</td>`).join("")}
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+
+            <div style="margin-top: 25px; font-size: 11px; line-height: 1.5; background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px;">
+              <strong>Affinity Analysis Summary:</strong><br />
+              - <strong>CO1</strong> maps strongly with PO1, PO5, PSO1 and PSO2 as it establishes the fundamental programming mechanics.<br />
+              - <strong>CO2</strong> maps key debugging and program tracing capabilities.<br />
+              - <strong>CO3</strong> maps synthesis of constructs into modules and data blocks.<br />
+              - <strong>CO4</strong> maps functional algorithm design and physical deployment onto microcontrollers (Arduino).
+            </div>
+
+            <div class="page-footer-block">
+              <span>Page 5 of 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGES 6 - 10: DETAILED LECTURE PLAN -->
+        ${Object.keys(lecturesByUnit).sort().map((unitNum, pageIdx) => {
+          const unitLectures = lecturesByUnit[unitNum];
+          // We can break lectures into sub-chunks of max 10 to 12 lectures per page to fit A4 perfectly
+          const chunkSize = 11;
+          const chunks = [];
+          for (let i = 0; i < unitLectures.length; i += chunkSize) {
+            chunks.push(unitLectures.slice(i, i + chunkSize));
+          }
+
+          return chunks.map((chunk, chunkIdx) => {
+            const pageNum = 6 + pageIdx * 2 + chunkIdx; // Approximate page number
+            return `
+              <div class="page-container">
+                <div class="double-border">
+                  <h3 class="section-title" style="margin-top: 0;">Unit ${unitNum} Lecture Plan ${chunks.length > 1 ? `(Part ${chunkIdx + 1})` : ''}</h3>
+                  
+                  <table style="flex: 1; margin-top: 10px;">
+                    <thead>
+                      <tr>
+                        <th style="width: 10%;">Class</th>
+                        <th style="width: 35%;">Topics to be covered</th>
+                        <th style="width: 15%;">Mode of Teaching</th>
+                        <th style="width: 15%;">In-Class Activities</th>
+                        <th style="width: 15%;">Out-Class Activities</th>
+                        <th style="width: 5%;">CO</th>
+                        <th style="width: 5%;">Ref</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${chunk.map(lecture => `
+                        <tr>
+                          <td class="center font-semibold">${html(lecture.classPeriod)}</td>
+                          <td class="justify">${html(lecture.topic)}</td>
+                          <td>${html(lecture.modeOfTeaching)}</td>
+                          <td>${html(lecture.inClassActivity)}</td>
+                          <td style="font-size: 8px; word-break: break-all;">${html(lecture.outClassActivity)}</td>
+                          <td class="center font-semibold">${html(joinList(lecture.coMapping))}</td>
+                          <td class="center">${html(joinList(lecture.reference))}</td>
+                        </tr>
+                      `).join("")}
+                    </tbody>
+                  </table>
+
+                  <div class="page-footer-block">
+                    <span>Page ${pageNum} of 12</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }).join("")}
+
+        <!-- PAGE 11: LAB EXPERIMENTS -->
+        <div class="page-container">
+          <div class="double-border">
+            <h3 class="section-title" style="margin-top: 0;">Lab Experiments Syllabus</h3>
+            
+            <div style="flex: 1; overflow-y: auto; font-size: 9.5px; line-height: 1.4; padding-right: 5px;">
+              <ol style="margin: 0; padding-left: 15px;">
+                <li style="margin-bottom: 6px;">
+                  <strong>Basic C programs</strong>
+                  <ul style="list-style-type: none; padding-left: 10px; margin-top: 3px;">
+                    <li>1.a) Write a C program to find sum and average of three numbers.</li>
+                    <li>1.b) Write a C program to find the greatest among three numbers.</li>
+                    <li>1.c) Write a C program to check whether given number is odd/even.</li>
+                    <li>1.d) Write a C program whether given year is a leap year or not.</li>
+                    <li>1.e) Write a C program to swap two numbers.</li>
+                    <li>1.f) Write a C program to evaluate algebraic expression (ax+b)/(ax-b).</li>
+                  </ul>
+                </li>
+                
+                <li style="margin-bottom: 6px;">
+                  <strong>Control Structures</strong>
+                  <ul style="list-style-type: none; padding-left: 10px; margin-top: 3px;">
+                    <li>2.a) Write a C program to check whether given number is perfect number or not.</li>
+                    <li>2.b) Write a C program to check whether given number is strong number or not.</li>
+                    <li>2.c) Write a C program perform arithmetic operations using switch statement.</li>
+                  </ul>
+                </li>
+
+                <li style="margin-bottom: 6px;">
+                  <strong>Looping Statements</strong>
+                  <ul style="list-style-type: none; padding-left: 10px; margin-top: 3px;">
+                    <li>3.a) Write a C program to generate prime numbers between 1 to n.</li>
+                    <li>3.b) Write a C program to produce the sum of individual digits of a given positive integer.</li>
+                    <li>3.c) Write a C program to Check whether given number is Armstrong Number or not.</li>
+                    <li>3.d) Write a C program to generate the first n terms of the Fibonacci sequence.</li>
+                  </ul>
+                </li>
+
+                <li style="margin-bottom: 6px;">
+                  <strong>Arrays</strong>
+                  <ul style="list-style-type: none; padding-left: 10px; margin-top: 3px;">
+                    <li>4.a) Write a C program to find both the largest and smallest number in a list of integers.</li>
+                    <li>4.b) Write a C Program to Sort the Array in an Ascending Order.</li>
+                    <li>4.c) Write a C Program to find whether given matrix is symmetric or not.</li>
+                    <li>4.d) Write a C program to perform addition of two matrices.</li>
+                  </ul>
+                </li>
+
+                <li style="margin-bottom: 6px;">
+                  <strong>Functions</strong>
+                  <ul style="list-style-type: none; padding-left: 10px; margin-top: 3px;">
+                    <li>5.a) Write a C program to find factorial of a given integer using non-recursive function.</li>
+                    <li>5.b) Write a C program to find factorial of a given integer using recursive function.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+
+            <div class="page-footer-block">
+              <span>Page 11 of 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 12: SIGNATURES AND REQUIREMENTS -->
+        <div class="page-container">
+          <div class="double-border" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 class="section-title" style="margin-top: 0;">Attendance Requirement</h3>
+              <ol style="font-size: 11px; line-height: 1.5; padding-left: 20px;" class="justify">
+                <li style="margin-bottom: 8px;"><strong>(i) All students must maintain a minimum of 75% attendance</strong> in each course. This requirement is crucial for academic success and eligibility to appear for mid-term and end-semester examinations.</li>
+                <li style="margin-bottom: 8px;"><strong>(ii) Students who fail to meet the 75% attendance threshold</strong> will not be permitted to appear for the mid-term and end-semester exams. Requests for exceptions will not be considered under any circumstances.</li>
+                <li><strong>(iii) Attendance will be calculated</strong> up to three days prior to the commencement of the mid-term and end-semester exams, as per the academic calendar.</li>
+              </ol>
+
+              <div style="margin-top: 30px; border: 1.5px solid #000; padding: 12px; font-size: 10px; background-color: #f8fafc;" class="justify">
+                <strong>Important Notice:</strong> Any changes or deviations in classes due to local holidays or unexpected closures will be compensated with special sessions outside official hours. Check details on the student portal regular updates.
+              </div>
+            </div>
+
+            <div>
+              <!-- Signatures Row -->
+              <div class="sig-row">
+                <div class="sig-box">
+                  <div style="height: 35px; display: flex; align-items: flex-end; justify-content: center; font-family:'Brush Script MT', cursive; font-size: 16px; color:#1e3a8a;">Dr.R.Annamalai</div>
+                  <div class="sig-line">Faculty</div>
+                </div>
+                <div class="sig-box">
+                  <div style="height: 35px; display: flex; align-items: flex-end; justify-content: center; font-family:'Brush Script MT', cursive; font-size: 16px; color:#1e3a8a;">Dr.R.Annamalai</div>
+                  <div class="sig-line">Course Mentor</div>
+                </div>
+                <div class="sig-box">
+                  <div style="height: 35px;"></div>
+                  <div class="sig-line">Program Chair / CSE</div>
+                </div>
+                <div class="sig-box">
+                  <div style="height: 35px;"></div>
+                  <div class="sig-line">Chairperson / CSE</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="page-footer-block">
+              <span>Page 12 of 12</span>
+            </div>
+          </div>
+        </div>
 
         <script>
           window.addEventListener("load", () => {
-            window.print();
+            // Only auto-print if we are indeed triggering a print action
+            if (window.location.search.includes("print=true") || true) {
+              window.print();
+            }
           });
         </script>
       </body>
@@ -323,15 +1039,34 @@ export default function CdpReview() {
               </h1>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab(activeTab === "edit" ? "preview" : "edit")}
-              className="btn-lift inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-[13px] font-semibold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 shadow-card focus-ring transition-all"
-            >
-              <FileText size={15} />
-              {activeTab === "edit" ? "Preview" : "Edit"}
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Segmented Tab Controls */}
+            <div className="inline-flex rounded-lg border border-slate-200 dark:border-gray-800 bg-slate-100/50 dark:bg-gray-900/50 p-1">
+              {[
+                { id: "edit", label: "Edit Plan", icon: FileText },
+                { id: "map", label: "Concept Map", icon: Layers },
+                { id: "preview", label: "Preview PDF", icon: BookOpen }
+              ].map((t) => {
+                const Icon = t.icon;
+                const isSelected = activeTab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActiveTab(t.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                      isSelected
+                        ? "bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100 shadow-sm"
+                        : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
+                    }`}
+                  >
+                    <Icon size={13} />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <button
               type="button"
               onClick={saveDraft}
@@ -394,12 +1129,23 @@ export default function CdpReview() {
         </aside>
 
         {activeTab === "preview" ? (
-          <div className="space-y-5">
-            <article
-              className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
+          <div className="space-y-5 overflow-x-auto flex flex-col items-center">
+            <div
+              className="print-preview-container"
+              style={{ transform: "scale(0.9)", transformOrigin: "top center", width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}
               dangerouslySetInnerHTML={{ __html: buildPrintableCdp(plan) }}
             />
           </div>
+        ) : activeTab === "map" ? (
+          <ConceptMapGenerator
+            plan={plan}
+            onUpdateConceptMap={(newMap) => {
+              updatePlan((current) => ({
+                ...current,
+                conceptMap: newMap,
+              }));
+            }}
+          />
         ) : (
           <div className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 sm:p-6">
             <Section title="Course Metadata" icon={BookOpen}>
@@ -428,6 +1174,28 @@ export default function CdpReview() {
                   label="Pre-requisites"
                   value={metadata.preRequisites}
                   onChange={(value) => setMetadata({ preRequisites: value })}
+                />
+                <TextInput
+                  label="Program"
+                  value={metadata.program}
+                  onChange={(value) => setMetadata({ program: value })}
+                />
+                <TextInput
+                  label="Semester / Year"
+                  value={metadata.semesterYear}
+                  onChange={(value) => setMetadata({ semesterYear: value })}
+                />
+                <TextArea
+                  label="Name(s) of the Faculty"
+                  value={metadata.facultyNames}
+                  onChange={(value) => setMetadata({ facultyNames: value })}
+                  rows={2}
+                />
+                <TextArea
+                  label="Course Overview"
+                  value={metadata.courseOverview}
+                  onChange={(value) => setMetadata({ courseOverview: value })}
+                  rows={3}
                 />
                 <div className="grid grid-cols-4 gap-2">
                   {["L", "T", "P", "C"].map((key) => (
