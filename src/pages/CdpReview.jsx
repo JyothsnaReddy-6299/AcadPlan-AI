@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   BookOpen,
   Check,
@@ -9,6 +10,7 @@ import {
   Save,
   Trash2,
   Layers,
+  RotateCcw,
 } from "lucide-react";
 import { useCdpPlan } from "../hooks/useCdpPlan";
 import ConceptMapGenerator from "../components/ConceptMapGenerator";
@@ -54,7 +56,7 @@ function TextInput({ label, value, onChange, type = "text" }) {
         type={type}
         value={value ?? ""}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-800"
+        className="w-full rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-[hsl(84,25%,52%)] focus:ring-2 focus:ring-[hsl(84,18%,80%)]/40 dark:focus:ring-[hsl(84,18%,40%)]/40"
       />
     </label>
   );
@@ -70,7 +72,7 @@ function TextArea({ label, value, onChange, rows = 3 }) {
         rows={rows}
         value={value ?? ""}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full resize-y rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm leading-6 text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-800"
+        className="w-full resize-y rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm leading-6 text-slate-800 dark:text-gray-200 outline-none transition-colors focus:border-[hsl(84,25%,52%)] focus:ring-2 focus:ring-[hsl(84,18%,80%)]/40 dark:focus:ring-[hsl(84,18%,40%)]/40"
       />
     </label>
   );
@@ -80,7 +82,7 @@ function Section({ title, icon: Icon, children }) {
   return (
     <section className="border-t border-slate-200 dark:border-gray-700 py-7 first:border-t-0 first:pt-0">
       <div className="mb-4 flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-[hsl(84,25%,92%)] dark:bg-[hsl(84,15%,20%)] text-[hsl(84,25%,42%)] dark:text-[hsl(84,20%,70%)]">
           <Icon size={16} />
         </span>
         <h2 className="text-base font-bold text-slate-900 dark:text-gray-100">{title}</h2>
@@ -344,11 +346,14 @@ function buildPrintableConceptMapSvg(plan) {
 
 function printCdp(plan) {
   const htmlStr = buildPrintableCdp(plan);
-  const win = window.open("", "_blank", "noopener,noreferrer");
+  const win = window.open("", "_blank");
   if (!win) return;
   win.document.write(htmlStr);
   win.document.close();
   win.focus();
+  setTimeout(() => {
+    win.print();
+  }, 500);
 }
 
 function buildPrintableCdp(plan) {
@@ -974,8 +979,11 @@ function buildPrintableCdp(plan) {
 }
 
 export default function CdpReview() {
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get("courseId") || "23CSE201";
+
   const { plan, updatePlan, saveDraft, generateDocument, status } =
-    useCdpPlan(COURSE_ID);
+    useCdpPlan(courseId);
   const [activeTab, setActiveTab] = useState("edit");
 
   const mappingKeys = useMemo(() => getMappingKeys(plan), [plan]);
@@ -1019,29 +1027,34 @@ export default function CdpReview() {
   const setCollection = (key, nextValue) =>
     updatePlan((current) => ({ ...current, [key]: nextValue }));
 
+  const handleResetToDefault = () => {
+    localStorage.removeItem(`acadplan_cdp_draft_v5_${courseId}`);
+    window.location.reload();
+  };
+
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-gray-100">
+    <main className="min-h-screen bg-ivory text-slate-900 dark:text-gray-100">
       {/* ── Premium page header ── */}
-      <div className="sticky top-0 z-30 border-b border-slate-200/80 dark:border-gray-800/80 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl">
+      <div className="sticky top-0 z-30 border-b" style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="grid h-9 w-9 place-items-center rounded-xl grad-brand shadow-glow-sm shrink-0">
               <BookOpen size={16} className="text-white" />
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[hsl(84,25%,38%)] dark:text-[hsl(84,20%,70%)]">
                 CDP Review
               </p>
-              <h1 className="text-lg font-bold text-ink dark:text-gray-100 leading-tight">
+              <h1 className="text-sm sm:text-base md:text-lg font-bold text-ink dark:text-gray-100 leading-tight">
                 {metadata.code}
                 <span className="font-normal text-slate-400 dark:text-gray-500 mx-1.5">—</span>
                 {metadata.name}
               </h1>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 shrink-0">
             {/* Segmented Tab Controls */}
-            <div className="inline-flex rounded-lg border border-slate-200 dark:border-gray-800 bg-slate-100/50 dark:bg-gray-900/50 p-1">
+            <div className="inline-flex rounded-lg border p-1" style={{ background: "var(--bg-elevated)", borderColor: "var(--border)" }}>
               {[
                 { id: "edit", label: "Edit Plan", icon: FileText },
                 { id: "map", label: "Concept Map", icon: Layers },
@@ -1056,9 +1069,10 @@ export default function CdpReview() {
                     onClick={() => setActiveTab(t.id)}
                     className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
                       isSelected
-                        ? "bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100 shadow-sm"
+                        ? "shadow-sm"
                         : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
                     }`}
+                    style={isSelected ? { background: "var(--bg-muted)", color: "var(--text-primary)" } : {}}
                   >
                     <Icon size={13} />
                     {t.label}
@@ -1069,13 +1083,24 @@ export default function CdpReview() {
 
             <button
               type="button"
+              onClick={handleResetToDefault}
+              className="btn-lift inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-semibold transition-all focus-ring shadow-card"
+              style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+              title="Discard draft edits and load original data from the JSON file"
+            >
+              <RotateCcw size={15} />
+              Reset to JSON
+            </button>
+
+            <button
+              type="button"
               onClick={saveDraft}
               disabled={status === "saving"}
-              className={`btn-lift inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-semibold shadow-card focus-ring transition-all disabled:opacity-60 ${
-                status === "saved"
-                  ? "border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
-                  : "border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700"
-              }`}
+              className={`btn-lift inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-semibold shadow-card focus-ring transition-all disabled:opacity-60`}
+              style={status === "saved"
+                ? { background: "rgba(16, 185, 129, 0.1)", borderColor: "rgba(16, 185, 129, 0.4)", color: "rgb(16, 185, 129)" }
+                : { background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }
+              }
             >
               {status === "saving" ? (
                 <Loader2 className="animate-spin" size={15} />
@@ -1092,7 +1117,7 @@ export default function CdpReview() {
               className="btn-lift inline-flex items-center gap-2 rounded-lg grad-brand px-3.5 py-2 text-[13px] font-semibold text-white shadow-glow-sm hover:shadow-glow focus-ring transition-all"
             >
               <Download size={15} />
-              Generate File
+              Export PDF
             </button>
           </div>
         </div>
@@ -1100,18 +1125,19 @@ export default function CdpReview() {
 
       <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[280px_1fr]">
         {/* ── Sidebar ── */}
-        <aside className="h-max rounded-2xl border border-slate-200/80 dark:border-gray-800/80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-card p-5 space-y-4">
+        <aside className="h-max rounded-2xl border backdrop-blur-sm shadow-card p-5 space-y-4" style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-slate-50 dark:bg-gray-800/80 border border-slate-100 dark:border-gray-700/50 p-3 text-center">
+            <div className="rounded-xl border p-3 text-center" style={{ background: "var(--bg-elevated)", borderColor: "var(--border)" }}>
               <div className="font-display text-2xl font-extrabold grad-brand-text">{plan.courseOutcomes?.length ?? 0}</div>
               <div className="text-[11.5px] font-semibold text-slate-500 dark:text-gray-400 mt-0.5">Course Outcomes</div>
             </div>
-            <div className="rounded-xl bg-slate-50 dark:bg-gray-800/80 border border-slate-100 dark:border-gray-700/50 p-3 text-center">
+            <div className="rounded-xl border p-3 text-center" style={{ background: "var(--bg-elevated)", borderColor: "var(--border)" }}>
               <div className="font-display text-2xl font-extrabold grad-brand-text">{plan.lecturePlan?.length ?? 0}</div>
               <div className="text-[11.5px] font-semibold text-slate-500 dark:text-gray-400 mt-0.5">Sessions</div>
             </div>
           </div>
-          <div className="rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/80 dark:bg-indigo-900/20 p-3.5 text-[13px] leading-relaxed text-indigo-800 dark:text-indigo-300">
+          <div className="rounded-xl border p-3.5 text-[13px] leading-relaxed text-[hsl(84,25%,35%)] dark:text-[hsl(84,20%,80%)]"
+            style={{ background: "var(--bg-muted)", borderColor: "var(--border)" }}>
             Review the extracted data, correct anything that looks off, save the draft, then generate the final CDP document.
           </div>
           {/* Quick stats */}
@@ -1147,7 +1173,7 @@ export default function CdpReview() {
             }}
           />
         ) : (
-          <div className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 sm:p-6">
+          <div className="rounded-2xl border p-5 sm:p-6" style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
             <Section title="Course Metadata" icon={BookOpen}>
               <div className="grid gap-4 md:grid-cols-2">
                 <TextInput
@@ -1216,9 +1242,10 @@ export default function CdpReview() {
                 {FIXED_PROGRAM_OUTCOMES.map((outcome, index) => (
                   <div
                     key={`${outcome.id}-${index}`}
-                    className="flex flex-col gap-1 rounded-lg border border-slate-100 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800/50 p-3 md:flex-row md:items-start md:gap-4"
+                    className="flex flex-col gap-1 rounded-lg border p-3 md:flex-row md:items-start md:gap-4"
+                    style={{ background: "var(--bg-elevated)", borderColor: "var(--border)" }}
                   >
-                    <span className="w-16 shrink-0 font-display text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase">
+                    <span className="w-16 shrink-0 font-display text-sm font-bold text-[hsl(84,25%,38%)] dark:text-[hsl(84,20%,70%)] uppercase">
                       {outcome.id}
                     </span>
                     <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-400">
@@ -1263,16 +1290,17 @@ export default function CdpReview() {
 
             <Section title="CO-PO/PSO Mapping" icon={Check}>
               <div className="overflow-x-auto">
-                <table className="min-w-[760px] border-collapse text-sm">
+                <table className="min-w-[760px] border-collapse text-sm border" style={{ borderColor: "var(--border)" }}>
                   <thead>
                     <tr>
-                      <th className="border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900 p-2 text-left dark:text-gray-300">
+                      <th className="border p-2 text-left" style={{ borderColor: "var(--border)", background: "var(--bg-elevated)", color: "var(--text-primary)" }}>
                         CO
                       </th>
                       {mappingKeys.map((key) => (
                         <th
                           key={key}
-                          className="border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900 p-2 text-center uppercase dark:text-gray-300"
+                          className="border p-2 text-center uppercase"
+                          style={{ borderColor: "var(--border)", background: "var(--bg-elevated)", color: "var(--text-primary)" }}
                         >
                           {key}
                         </th>
@@ -1282,11 +1310,11 @@ export default function CdpReview() {
                   <tbody>
                     {(plan.coPoMappings ?? []).map((row, rowIndex) => (
                       <tr key={row.co}>
-                        <td className="border border-slate-200 dark:border-gray-700 p-2 font-semibold dark:text-gray-300">
+                        <td className="border p-2 font-semibold" style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}>
                           {row.co}
                         </td>
                         {mappingKeys.map((key) => (
-                          <td key={key} className="border border-slate-200 dark:border-gray-700 p-1">
+                          <td key={key} className="border p-1" style={{ borderColor: "var(--border)" }}>
                             <input
                               value={row[key] ?? "-"}
                               onChange={(event) =>
@@ -1297,7 +1325,8 @@ export default function CdpReview() {
                                   })
                                 )
                               }
-                              className="h-8 w-full rounded border border-slate-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 text-center text-sm outline-none focus:border-indigo-400"
+                              className="h-8 w-full rounded border text-center text-sm outline-none transition-colors focus:border-[hsl(84,25%,52%)] focus:ring-1 focus:ring-[hsl(84,18%,80%)]/40"
+                              style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }}
                             />
                           </td>
                         ))}
@@ -1313,7 +1342,8 @@ export default function CdpReview() {
                 {(plan.lecturePlan ?? []).map((lecture, index) => (
                   <div
                     key={`${lecture.classPeriod}-${index}`}
-                    className="rounded-lg border border-slate-200 dark:border-gray-700 dark:bg-gray-800/50 p-4"
+                    className="rounded-lg border p-4"
+                    style={{ borderColor: "var(--border)", background: "var(--bg-elevated)" }}
                   >
                     <div className="mb-3 flex items-center justify-between">
                       <span className="text-sm font-bold text-slate-700 dark:text-gray-300">
@@ -1372,16 +1402,16 @@ export default function CdpReview() {
                       />
                       <div className="md:col-span-3">
                         <TextArea
-                          label="Topic"
-                          value={lecture.topic}
-                          onChange={(value) =>
-                            setCollection(
-                              "lecturePlan",
-                              updateArrayItem(plan.lecturePlan, index, {
-                                topic: value,
-                              })
-                            )
-                          }
+                           label="Topic"
+                           value={lecture.topic}
+                           onChange={(value) =>
+                             setCollection(
+                               "lecturePlan",
+                               updateArrayItem(plan.lecturePlan, index, {
+                                 topic: value,
+                               })
+                             )
+                           }
                         />
                       </div>
                       <TextInput
@@ -1443,7 +1473,8 @@ export default function CdpReview() {
                       EMPTY_LECTURE,
                     ])
                   }
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700"
+                  className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-all focus-ring shadow-card"
+                  style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }}
                 >
                   <Plus size={16} />
                   Add Session

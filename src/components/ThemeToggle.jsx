@@ -12,11 +12,11 @@ export function ThemeToggle({ className = "" }) {
       aria-checked={isDarkMode}
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
       onClick={toggleDarkMode}
-      className={`relative flex w-[52px] h-7 items-center rounded-full border cursor-pointer select-none transition-all duration-300 focus-ring ${
-        isDarkMode
-          ? "bg-gray-800 border-gray-700"
-          : "bg-slate-100 border-slate-200"
-      } ${className}`}
+      className={`relative flex w-[52px] h-7 items-center rounded-full border cursor-pointer select-none transition-all duration-300 focus-ring ${className}`}
+      style={{
+        background: isDarkMode ? "hsl(90 10% 18%)" : "hsl(84 18% 84%)",
+        borderColor: isDarkMode ? "hsl(90 10% 26%)" : "hsl(84 18% 72%)",
+      }}
     >
       {/* Track */}
       <span className="sr-only">{isDarkMode ? "Dark mode" : "Light mode"}</span>
@@ -25,11 +25,11 @@ export function ThemeToggle({ className = "" }) {
       <motion.span
         layout
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        className={`absolute grid h-5 w-5 place-items-center rounded-full shadow-sm transition-colors duration-300 ${
-          isDarkMode
-            ? "left-[26px] bg-indigo-500"
-            : "left-[2px] bg-white"
-        }`}
+        className="absolute grid h-5 w-5 place-items-center rounded-full shadow-sm transition-colors duration-300"
+        style={{
+          left: isDarkMode ? "26px" : "2px",
+          background: isDarkMode ? "hsl(84 25% 48%)" : "hsl(43 55% 97%)",
+        }}
       >
         <motion.span
           key={isDarkMode ? "moon" : "sun"}

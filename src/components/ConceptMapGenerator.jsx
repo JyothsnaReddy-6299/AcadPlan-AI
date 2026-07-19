@@ -343,8 +343,13 @@ export default function ConceptMapGenerator({ plan, onUpdateConceptMap }) {
       { id: "CO4", description: "Develop physical computing programs" }
     ];
 
-    // Card 1 to 4: Course Outcomes (CO1-CO4)
-    outcomes.forEach((co, idx) => {
+    // Determine how many outcomes we have. Clamp to at most 6 outcomes.
+    const maxCOs = Math.min(outcomes.length, 6);
+    const coNodesCount = maxCOs;
+    const poNodesCount = 8 - coNodesCount;
+
+    // Card 1 to coNodesCount: Course Outcomes
+    outcomes.slice(0, coNodesCount).forEach((co, idx) => {
       const desc = co.description || "Course outcome objective mapping.";
       const shortDesc = desc.split(" thereby")[0]?.split(",")[0] || desc;
       const themeColor = THEME_COLORS[idx % THEME_COLORS.length];
@@ -359,34 +364,35 @@ export default function ConceptMapGenerator({ plan, onUpdateConceptMap }) {
       });
     });
 
-    // Card 5 to 8: Mapped Program Outcomes & Key Focus Mappings
+    // Card (coNodesCount + 1) to 8: Mapped Program Outcomes & Key Focus Mappings
     const matrixRow = plan.coPoMappings || [];
     const activePOs = Array.from(
       new Set(matrixRow.flatMap(m => 
         Object.keys(m).filter(k => k !== "co" && m[k] !== "-" && m[k] !== "")
       ))
-    ).map(po => po.toUpperCase()).slice(0, 4);
+    ).map(po => po.toUpperCase()).slice(0, poNodesCount);
 
-    const fallbackPos = ["PO1", "PO2", "PO5", "PSO1"];
-    const displayPos = activePOs.length >= 4 ? activePOs : fallbackPos;
+    const fallbackPos = ["PO1", "PO2", "PO5", "PSO1"].slice(0, poNodesCount);
+    const displayPos = activePOs.length >= poNodesCount ? activePOs : fallbackPos;
 
     const poDescriptions = {
-      PO1: "Engineering Knowledge: Apply concepts to analyze software structures.",
-      PO2: "Problem Analysis: Solve complex pointer and pointer-arithmetic mappings.",
-      PO5: "Modern Tool Usage: Use Arduino and debugging tools for testing.",
-      PSO1: "Embedded Systems Skillset: Develop low-level firmware computing.",
+      PO1: "Engineering Knowledge: Apply optimization principles to engineering problems.",
+      PO2: "Problem Analysis: Formulate and analyze mathematical gradients and optimality search criteria.",
+      PO3: "Design/development of solutions: Design computational algorithms for multivariable constraints.",
+      PO5: "Modern Tool Usage: Implement iterative optimization algorithms using software/MATLAB.",
+      PSO1: "Skillset: Formulate and solve complex interdisciplinary models.",
     };
 
     displayPos.forEach((po, idx) => {
-      const themeColor = THEME_COLORS[(idx + 4) % THEME_COLORS.length];
-      const desc = poDescriptions[po] || `Builds specialized engineering capacity mapped to course unit segments.`;
+      const themeColor = THEME_COLORS[(idx + coNodesCount) % THEME_COLORS.length];
+      const desc = poDescriptions[po] || `Builds specialized capacity mapped to course unit segments.`;
       
       rawNodes.push({
         id: po,
         label: `Accreditation ${po}`,
         description: desc,
         type: "sub",
-        badgeNumber: idx + 5,
+        badgeNumber: idx + coNodesCount + 1,
         themeColor,
         parentId: "root",
       });

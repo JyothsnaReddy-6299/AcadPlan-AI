@@ -1,7 +1,7 @@
 import { apiRequest } from "../lib/Api";
 
 const STORAGE_PREFIX = "acadplan_copo_matrix";
-const MOCK_MATRIX_URL = "mock-data/cdp-plan.json";
+const MOCK_MATRIX_URL = "/mock-data/cdp-plan.json";
 const shouldUseMockApi = import.meta.env.VITE_USE_MOCK_API !== "false";
 
 function normalizeMatrixResponse(payload) {
@@ -27,7 +27,7 @@ export async function fetchMatrix(courseId) {
   const saved = localStorage.getItem(`${STORAGE_PREFIX}_${courseId}`);
   if (saved) return normalizeMatrixResponse(JSON.parse(saved));
 
-  const response = await fetch(MOCK_MATRIX_URL);
+  const response = await fetch(`${MOCK_MATRIX_URL}?t=${Date.now()}`);
   if (!response.ok) {
     throw new Error(`Failed to load mock matrix: ${response.status}`);
   }

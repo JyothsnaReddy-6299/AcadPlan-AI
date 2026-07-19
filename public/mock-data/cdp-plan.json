@@ -13,7 +13,7 @@
       "C": 4
     }
   },
-    "courseOutcomes": [
+  "courseOutcomes": [
     { "id": "CO1", "description": "Understand the typical programming constructs: data (primitive and compound), control, modularity, recursion, etc. thereby to understand a given program." },
     { "id": "CO2", "description": "Analyze the given program by tracing, identify coding errors and debug them." },
     { "id": "CO3", "description": "Apply the programming constructs appropriately and effectively while developing computer program." },
@@ -391,5 +391,4 @@
       { "level": 3, "targetPercentage": 65, "studentPercentage": 60 }
     ]
   }
-
 }

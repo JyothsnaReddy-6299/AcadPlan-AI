@@ -4,8 +4,7 @@ import { Network, Map, FileDown, Zap, Shield, Clock } from "lucide-react";
 const FEATURES = [
   {
     icon: Network,
-    accentClass: "from-indigo-500 to-violet-600",
-    glowClass: "shadow-glow-violet",
+    gradient: "linear-gradient(135deg, hsl(84 25% 40%), hsl(84 18% 60%))",
     tag: "Core",
     title: "Automated CO-PO Mapping",
     description:
@@ -13,8 +12,7 @@ const FEATURES = [
   },
   {
     icon: Map,
-    accentClass: "from-violet-500 to-teal-500",
-    glowClass: "shadow-glow-teal",
+    gradient: "linear-gradient(135deg, hsl(84 18% 55%), hsl(84 15% 70%))",
     tag: "Visual",
     title: "AI Concept Maps",
     description:
@@ -22,8 +20,7 @@ const FEATURES = [
   },
   {
     icon: FileDown,
-    accentClass: "from-teal-500 to-indigo-500",
-    glowClass: "shadow-glow-sm",
+    gradient: "linear-gradient(135deg, hsl(84 20% 50%), hsl(84 18% 66%))",
     tag: "Export",
     title: "Instant PDF Export",
     description:
@@ -31,8 +28,7 @@ const FEATURES = [
   },
   {
     icon: Zap,
-    accentClass: "from-amber-500 to-orange-500",
-    glowClass: "shadow-[0_0_28px_-6px_rgba(245,158,11,0.35)]",
+    gradient: "linear-gradient(135deg, hsl(38 80% 55%), hsl(38 60% 68%))",
     tag: "Speed",
     title: "Lightning Fast",
     description:
@@ -40,8 +36,7 @@ const FEATURES = [
   },
   {
     icon: Shield,
-    accentClass: "from-emerald-500 to-teal-600",
-    glowClass: "shadow-[0_0_28px_-6px_rgba(16,185,129,0.35)]",
+    gradient: "linear-gradient(135deg, hsl(150 40% 40%), hsl(150 30% 55%))",
     tag: "Compliance",
     title: "Accreditation Ready",
     description:
@@ -49,8 +44,7 @@ const FEATURES = [
   },
   {
     icon: Clock,
-    accentClass: "from-rose-500 to-pink-600",
-    glowClass: "shadow-[0_0_28px_-6px_rgba(244,63,94,0.30)]",
+    gradient: "linear-gradient(135deg, hsl(0 45% 52%), hsl(0 35% 65%))",
     tag: "Productivity",
     title: "Saves 10+ Hours/Week",
     description:
@@ -59,20 +53,22 @@ const FEATURES = [
 ];
 
 const containerVariants = {
-  hidden: {},
+  hidden:  {},
   visible: { transition: { staggerChildren: 0.09 } },
 };
 const cardVariants = {
-  hidden: { opacity: 0, y: 36 },
+  hidden:  { opacity: 0, y: 36 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.4, 0, 0.2, 1] } },
 };
 
 export default function FeatureCards() {
   return (
-    <section id="features" className="relative bg-ivory dark:bg-gray-950 px-4 sm:px-6 py-24 sm:py-32 overflow-hidden transition-colors">
+    <section id="features" className="relative px-4 sm:px-6 py-24 sm:py-32 overflow-hidden transition-colors"
+      style={{ background: "var(--bg-page)" }}>
       {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 grad-mesh opacity-60 dark:opacity-30" aria-hidden />
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 grad-mesh opacity-70" aria-hidden />
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-px" aria-hidden
+        style={{ background: "linear-gradient(to right, transparent, hsl(84 18% 68% / 0.5), transparent)" }} />
 
       <div className="relative mx-auto max-w-7xl">
         {/* Section header */}
@@ -83,14 +79,16 @@ export default function FeatureCards() {
           transition={{ duration: 0.55, ease: "easeOut" }}
           className="mx-auto max-w-2xl text-center mb-14 sm:mb-20"
         >
-          <span className="inline-block rounded-full glass-adaptive dark:glass-dark border border-indigo-100/50 dark:border-indigo-900/40 px-4 py-1 text-[12px] font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4">
+          <span className="inline-block rounded-full px-4 py-1 text-[12px] font-semibold uppercase tracking-widest mb-4"
+            style={{ background: "var(--bg-muted)", color: "hsl(84 25% 38%)", border: "1px solid var(--border)" }}>
             Features
           </span>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink dark:text-gray-50 tracking-tight leading-[1.15]">
+          <h2 className="font-display font-bold text-3xl sm:text-4xl tracking-tight leading-[1.15]"
+            style={{ color: "var(--text-primary)" }}>
             Everything you need{" "}
             <span className="grad-brand-text">in one platform</span>
           </h2>
-          <p className="mt-4 text-[15px] text-slate-500 dark:text-gray-400 leading-relaxed">
+          <p className="mt-4 text-[15px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
             Streamline every step of your academic planning workflow with purpose-built intelligent tools.
           </p>
         </motion.div>
@@ -103,46 +101,45 @@ export default function FeatureCards() {
           viewport={{ once: true, amount: 0.1 }}
           className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {FEATURES.map(({ icon: Icon, accentClass, glowClass, tag, title, description }) => (
+          {FEATURES.map(({ icon: Icon, gradient, tag, title, description }) => (
             <motion.article
               key={title}
               variants={cardVariants}
               whileHover={{ y: -6, transition: { duration: 0.25, ease: [0.34, 1.56, 0.64, 1] } }}
-              className="group relative rounded-2xl border border-white/70 dark:border-gray-800/80 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm shadow-card hover:shadow-card-hover overflow-hidden transition-shadow duration-300 cursor-pointer"
+              className="group relative rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-300"
+              style={{
+                background: "var(--bg-surface)",
+                border: "1.5px solid var(--border)",
+                boxShadow: "0 4px 20px -6px rgba(60,68,48,0.10)",
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = "0 14px 40px -10px rgba(60,68,48,0.18)"}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 20px -6px rgba(60,68,48,0.10)"}
             >
-              {/* Gradient hover overlay (GPU promoted) */}
-              <div
-                className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${accentClass} opacity-0 group-hover:opacity-[0.04] dark:group-hover:opacity-[0.08] transition-opacity duration-400 will-opacity`}
-              />
-
-              {/* Top gradient line */}
-              <div className={`absolute top-0 inset-x-0 h-px bg-gradient-to-r ${accentClass} opacity-0 group-hover:opacity-60 transition-opacity duration-300`} />
+              {/* Top gradient line on hover */}
+              <div className="absolute top-0 inset-x-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: gradient }} />
 
               <div className="relative p-6 sm:p-7">
                 {/* Tag */}
-                <span className="inline-block rounded-full bg-slate-100 dark:bg-gray-800 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400 mb-5">
+                <span className="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide mb-5"
+                  style={{ background: "var(--bg-muted)", color: "hsl(84 20% 42%)" }}>
                   {tag}
                 </span>
 
                 {/* Icon */}
-                <div className={`inline-grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${accentClass} ${glowClass} shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg will-transform`}>
+                <div className="inline-grid h-11 w-11 place-items-center rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 will-transform"
+                  style={{ background: gradient }}>
                   <Icon className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
 
-                <h3 className="mt-4 font-display font-semibold text-[15.5px] text-ink dark:text-gray-100 leading-snug group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors duration-200">
+                <h3 className="mt-4 font-display font-semibold text-[15.5px] leading-snug transition-colors duration-200"
+                  style={{ color: "var(--text-primary)" }}>
                   {title}
                 </h3>
-                <p className="mt-2.5 text-[13.5px] leading-relaxed text-slate-500 dark:text-gray-400">
+                <p className="mt-2.5 text-[13.5px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                   {description}
                 </p>
 
-                {/* Bottom arrow — appears on hover */}
-                <div className="mt-5 flex items-center gap-1.5 text-[12.5px] font-semibold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-250 -translate-x-2 group-hover:translate-x-0 will-transform transition-transform">
-                  <span>Learn more</span>
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
               </div>
             </motion.article>
           ))}

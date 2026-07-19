@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -191,8 +192,11 @@ function BottomActionBar({ onSave, status }) {
 // ---------------------------------------------------------------------------
 
 export default function CoPoMatrixDashboard() {
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get("courseId") || "23CSE201";
+
   const { course, cos, pos, options, matrix, updateCell, saveDraft, status } =
-    useCoPoMatrix("23CSE201");
+    useCoPoMatrix(courseId);
 
   return (
     <div className="relative flex min-h-screen flex-col">

@@ -51,12 +51,10 @@ const SOCIALS = [
 
 export default function Footer() {
   return (
-    <footer className="relative bg-white dark:bg-gray-950 border-t border-slate-100 dark:border-gray-800/80 overflow-hidden transition-colors">
-      {/* Subtle gradient top bar */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
-
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 grad-mesh opacity-30 dark:opacity-15" aria-hidden />
+    <footer className="relative overflow-hidden transition-colors"
+      style={{ background: "var(--bg-page)", borderTop: "1px solid var(--border)" }}>
+      <div className="h-px w-full" style={{ background: "linear-gradient(to right, transparent, hsl(84 18% 60% / 0.5), transparent)" }} />
+      <div className="pointer-events-none absolute inset-0 grad-mesh opacity-50" aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16">
         {/* ── Main grid ── */}
@@ -69,7 +67,7 @@ export default function Footer() {
               </span>
               <span className="font-display font-bold text-[16px] grad-brand-text">AcadPlan AI</span>
             </Link>
-            <p className="max-w-xs text-[13.5px] leading-relaxed text-slate-500 dark:text-gray-400">
+            <p className="max-w-xs text-[13.5px] leading-relaxed" style={{ color: "hsl(84 10% 50%)" }}>
               Automate your academic documentation — from syllabi to accreditation-ready CO-PO matrices in seconds.
             </p>
             {/* Socials */}
@@ -79,7 +77,10 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="group grid h-8 w-8 place-items-center rounded-lg bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-500 dark:text-gray-400 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white transition-all duration-200 focus-ring"
+                  className="group grid h-8 w-8 place-items-center rounded-lg border text-sm transition-all duration-200 focus-ring"
+                  style={{ background: "hsl(84 15% 82%)", borderColor: "hsl(84 18% 70%)", color: "hsl(84 18% 46%)" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "hsl(84 25% 45%)"; e.currentTarget.style.color = "white"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "hsl(84 15% 82%)"; e.currentTarget.style.color = "hsl(84 18% 46%)"; }}
                 >
                   {icon()}
                 </a>
@@ -90,7 +91,7 @@ export default function Footer() {
           {/* Link columns */}
           {Object.entries(LINKS).map(([heading, items]) => (
             <div key={heading}>
-              <h3 className="mb-4 text-[11.5px] font-bold uppercase tracking-widest text-slate-400 dark:text-gray-500">
+              <h3 className="mb-4 text-[11.5px] font-bold uppercase tracking-widest" style={{ color: "hsl(84 15% 52%)" }}>
                 {heading}
               </h3>
               <ul className="space-y-2.5">
@@ -99,14 +100,20 @@ export default function Footer() {
                     {to ? (
                       <Link
                         to={to}
-                        className="text-[13.5px] text-slate-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 focus-ring rounded"
+                        className="text-[13.5px] transition-colors duration-200 focus-ring rounded"
+                        style={{ color: "hsl(84 10% 50%)" }}
+                        onMouseEnter={e => e.target.style.color = "hsl(84 25% 38%)"}
+                        onMouseLeave={e => e.target.style.color = "hsl(84 10% 50%)"}
                       >
                         {label}
                       </Link>
                     ) : (
                       <a
                         href={href}
-                        className="text-[13.5px] text-slate-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 focus-ring rounded"
+                        className="text-[13.5px] transition-colors duration-200 focus-ring rounded"
+                        style={{ color: "hsl(84 10% 50%)" }}
+                        onMouseEnter={e => e.target.style.color = "hsl(84 25% 38%)"}
+                        onMouseLeave={e => e.target.style.color = "hsl(84 10% 50%)"}
                       >
                         {label}
                       </a>
@@ -119,10 +126,8 @@ export default function Footer() {
         </div>
 
         {/* ── Divider ── */}
-        <div className="my-8 h-px bg-slate-100 dark:bg-gray-800/80" />
-
-        {/* ── Bottom bar ── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[12.5px] text-slate-400 dark:text-gray-500">
+        <div className="my-8 h-px" style={{ background: "var(--border)" }} />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[12.5px]" style={{ color: "var(--text-faint)" }}>
           <span>
             © {new Date().getFullYear()} AcadPlan AI. All rights reserved.
           </span>
